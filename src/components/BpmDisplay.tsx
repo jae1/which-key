@@ -67,20 +67,24 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
           </span>
         </div>
 
-        {/* Manual Tap BPM */}
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          background: manualBpm > 0 ? 'var(--primary-glow)' : 'rgba(128,128,128,0.01)', 
-          border: manualBpm > 0 ? '1px solid var(--primary)' : '1px solid var(--border-color)', 
-          borderRadius: '8px',
-          padding: '16px 8px',
-          height: '100%',
-          textAlign: 'center',
-          transition: 'all 0.15s ease'
-        }}>
+        {/* Manual Tap BPM - Clickable Card for Tap Tempo */}
+        <div 
+          onClick={tapTempo}
+          className="tap-card"
+          style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            background: manualBpm > 0 ? 'var(--primary-glow)' : 'rgba(128,128,128,0.01)', 
+            border: manualBpm > 0 ? '1px solid var(--primary)' : '1px solid var(--border-color)', 
+            borderRadius: '8px',
+            padding: '16px 8px',
+            height: '100%',
+            textAlign: 'center'
+          }}
+          title="이 카드 영역을 마우스 클릭하거나 터치하여 템포를 입력할 수 있습니다."
+        >
           <span style={{ fontSize: '10px', fontWeight: 600, color: manualBpm > 0 ? 'var(--primary)' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             TAP
           </span>
@@ -93,8 +97,8 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
           }}>
             {manualBpm > 0 ? manualBpm : '--'}
           </div>
-          <span style={{ fontSize: '10px', color: manualBpm > 0 ? 'var(--primary)' : 'var(--text-muted)' }}>
-            {manualBpm > 0 ? '탭 입력값' : '수동 입력'}
+          <span style={{ fontSize: '10px', color: manualBpm > 0 ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 500 }}>
+            {manualBpm > 0 ? '탭 입력값' : '여기를 눌러 탭'}
           </span>
         </div>
       </div>
@@ -111,7 +115,7 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
             }} 
           />
           <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-            {isMonitoring && bpm ? '템포 감지 작동 중' : '박자에 맞춰 클릭해 템포를 측정하세요'}
+            {isMonitoring && bpm ? '템포 감지 작동 중' : '박자에 맞춰 카드나 아래 버튼을 탭하세요'}
           </span>
         </div>
 
@@ -119,10 +123,12 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
           onClick={tapTempo}
           className="btn-primary"
           style={{ 
-            padding: '10px', 
-            fontSize: '14px', 
+            padding: '14px', 
+            fontSize: '15px', 
+            fontWeight: 'bold',
             borderRadius: '8px',
-            background: 'var(--primary)'
+            background: 'var(--primary)',
+            boxShadow: '0 4px 10px rgba(var(--primary-rgb), 0.12)'
           }}
         >
           TAP TEMPO

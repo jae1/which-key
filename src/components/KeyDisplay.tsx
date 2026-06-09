@@ -6,6 +6,7 @@ interface KeyDisplayProps {
   confidence: number;
   alternativeKeys: KeyPrediction[];
   isMonitoring: boolean;
+  inputLevel: number;
   onStartMonitoring?: () => void;
   onStopMonitoring?: () => void;
   hideHeader?: boolean;
@@ -16,6 +17,7 @@ export function KeyDisplay({
   confidence, 
   alternativeKeys, 
   isMonitoring, 
+  inputLevel,
   onStartMonitoring, 
   onStopMonitoring 
 }: KeyDisplayProps) {
@@ -40,6 +42,28 @@ export function KeyDisplay({
   const parallelKey = detectedKey ? getParallelKey(root, isMajor) : '';
   const { subdominant, dominant } = detectedKey ? getRelatedKeys(root, isMajor) : { subdominant: '', dominant: '' };
 
+  const renderMicLevel = () => {
+    return (
+      <div style={{ width: '100%', margin: '4px 0 8px', opacity: isMonitoring ? 1 : 0.4, transition: 'opacity 0.2s ease' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', marginBottom: '4px' }}>
+          <span>마이크 레벨 (Mic Level)</span>
+          <span>{isMonitoring ? `${inputLevel}%` : '대기 중'}</span>
+        </div>
+        <div style={{ width: '100%', height: '4px', backgroundColor: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+          <div 
+            style={{ 
+              width: isMonitoring ? `${inputLevel}%` : '0%', 
+              height: '100%', 
+              background: 'var(--primary)',
+              borderRadius: '2px',
+              transition: 'width 0.1s ease'
+            }} 
+          />
+        </div>
+      </div>
+    );
+  };
+
   // 1. Idle state (no key detected and not monitoring)
   if (!detectedKey && !isMonitoring) {
     return (
@@ -53,7 +77,7 @@ export function KeyDisplay({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '16px',
+          marginBottom: '12px',
           border: '1px solid var(--panel-border)',
           boxShadow: 'var(--shadow-sm)'
         }}>
@@ -64,14 +88,18 @@ export function KeyDisplay({
             <line x1="8" y1="23" x2="16" y2="23"/>
           </svg>
         </div>
-        <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px', fontSize: '15px' }}>오디오 입력 대기 중</h4>
-        <p style={{ fontSize: '13px', maxWidth: '280px', color: 'var(--text-secondary)', marginBottom: '20px', lineHeight: 1.4 }}>
+        <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', fontSize: '15px' }}>오디오 입력 대기 중</h4>
+        <p style={{ fontSize: '13px', maxWidth: '280px', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: 1.4 }}>
           마이크 권한을 수락하고 분석을 시작하면 주변 기기나 연주 소리를 실시간으로 분석합니다.
         </p>
+        
+        {renderMicLevel()}
+        
         <button
           onClick={onStartMonitoring}
           className="btn-primary"
           style={{
+            marginTop: '8px',
             padding: '10px 24px',
             fontSize: '14px',
             fontWeight: 600,
@@ -90,7 +118,7 @@ export function KeyDisplay({
   // 2. Monitoring started, but no key detected yet
   if (isMonitoring && !detectedKey) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, textAlign: 'center', padding: '40px 20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, textAlign: 'center', padding: '30px 20px' }}>
         <div className="loader-spin" style={{
           width: '28px',
           height: '28px',
@@ -100,12 +128,15 @@ export function KeyDisplay({
           marginBottom: '16px'
         }} />
         <p style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '4px' }}>음향 신호 대기 중...</p>
-        <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>마이크나 악기 소리를 연주해 보세요.</p>
+        <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }}>마이크나 악기 소리를 연주해 보세요.</p>
+        
+        {renderMicLevel()}
+        
         <button
           onClick={onStopMonitoring}
           className="btn-secondary"
           style={{
-            marginTop: '20px',
+            marginTop: '12px',
             padding: '6px 16px',
             fontSize: '12px',
             borderRadius: '6px'
@@ -195,8 +226,9 @@ export function KeyDisplay({
         </div>
       </div>
 
-      {/* Action button inside panel */}
-      <div style={{ marginTop: '4px' }}>
+      {/* Mic Level and Action button inside panel */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+        {renderMicLevel()}
         {isMonitoring ? (
           <button
             onClick={onStopMonitoring}

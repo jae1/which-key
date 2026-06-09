@@ -461,3 +461,58 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+/* Mobile header refinements and responsiveness */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 650px) {
+  .app-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding-bottom: 14px;
+  }
+  
+  .logo-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .header-controls {
+    display: grid;
+    grid-template-columns: 1fr auto auto; /* Play button spans remaining width, others fit content */
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .btn-reset-layout .btn-text {
+    display: none; /* Hide text on mobile to save space, show only icon! */
+  }
+  
+  .btn-reset-layout {
+    padding: 8px 10px;
+  }
+}
+
+/* Tap card interactive visual feedback */
+.tap-card {
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s cubic-bezier(0.1, 0.8, 0.3, 1), 
+              background-color 0.15s ease, 
+              border-color 0.15s ease, 
+              box-shadow 0.15s ease;
+}
+
+.tap-card:active {
+  transform: scale(0.96);
+  background-color: var(--primary-glow) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 12px rgba(var(--primary-rgb), 0.1);
+}

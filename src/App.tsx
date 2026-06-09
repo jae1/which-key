@@ -81,11 +81,23 @@ function WidgetHeader({
         )}
       </div>
       
-      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={(e) => e.stopPropagation()}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
         {index > 0 && (
           <button 
             onClick={() => onMove(widget.id, 'left')}
-            style={{ padding: '2px 4px', fontSize: '11px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            style={{ 
+              width: '26px',
+              height: '26px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '13px', 
+              background: 'transparent', 
+              border: 'none', 
+              color: 'var(--text-muted)', 
+              cursor: 'pointer',
+              borderRadius: '4px'
+            }}
             title="왼쪽으로 이동"
           >
             ←
@@ -94,7 +106,19 @@ function WidgetHeader({
         {index < totalInRow - 1 && (
           <button 
             onClick={() => onMove(widget.id, 'right')}
-            style={{ padding: '2px 4px', fontSize: '11px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            style={{ 
+              width: '26px',
+              height: '26px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '13px', 
+              background: 'transparent', 
+              border: 'none', 
+              color: 'var(--text-muted)', 
+              cursor: 'pointer',
+              borderRadius: '4px'
+            }}
             title="오른쪽으로 이동"
           >
             →
@@ -104,15 +128,20 @@ function WidgetHeader({
         <button
           onClick={() => onToggleCollapse(widget.id)}
           style={{ 
-            padding: '2px 6px', 
-            fontSize: '11px', 
+            width: '28px',
+            height: '28px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '14px', 
             background: 'var(--border-color)', 
             border: 'none', 
             color: 'var(--text-primary)',
-            borderRadius: '4px',
-            marginLeft: '4px',
+            borderRadius: '6px',
+            marginLeft: '2px',
             fontWeight: 'bold',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            transition: 'background-color 0.15s ease'
           }}
           title={widget.isCollapsed ? '펼치기' : '접기'}
         >
@@ -148,7 +177,7 @@ function App() {
     top: Widget[];
     bottom: Widget[];
   }>(() => {
-    const saved = localStorage.getItem('dashboard_layout_v7');
+    const saved = localStorage.getItem('dashboard_layout_v8');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -156,8 +185,8 @@ function App() {
     }
     return {
       top: [
-        { id: 'chroma', title: '크로마 휠 (Chroma Wheel)', isCollapsed: false },
-        { id: 'key', title: '감지된 키 (Key)', isCollapsed: false }
+        { id: 'key', title: '감지된 키 (Key)', isCollapsed: false },
+        { id: 'chroma', title: '크로마 휠 (Chroma Wheel)', isCollapsed: false }
       ],
       bottom: [
         { id: 'transposition', title: '조바꿈 (Transpose)', isCollapsed: false },
@@ -168,7 +197,7 @@ function App() {
   });
 
   useEffect(() => {
-    localStorage.setItem('dashboard_layout_v7', JSON.stringify(layout));
+    localStorage.setItem('dashboard_layout_v8', JSON.stringify(layout));
   }, [layout]);
 
   const [draggedWidgetId, setDraggedWidgetId] = useState<string | null>(null);
@@ -258,8 +287,8 @@ function App() {
   const handleResetLayout = () => {
     const defaultLayout = {
       top: [
-        { id: 'chroma', title: '크로마 휠 (Chroma Wheel)', isCollapsed: false },
-        { id: 'key', title: '감지된 키 (Key)', isCollapsed: false }
+        { id: 'key', title: '감지된 키 (Key)', isCollapsed: false },
+        { id: 'chroma', title: '크로마 휠 (Chroma Wheel)', isCollapsed: false }
       ],
       bottom: [
         { id: 'transposition', title: '조바꿈 (Transpose)', isCollapsed: false },
@@ -268,7 +297,7 @@ function App() {
       ]
     };
     setLayout(defaultLayout);
-    localStorage.removeItem('dashboard_layout_v7');
+    localStorage.removeItem('dashboard_layout_v8');
   };
 
   const toggleMonitoring = () => {
@@ -315,29 +344,12 @@ function App() {
       switch (widget.id) {
         case 'chroma':
           return (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', width: '100%' }}>
               <ChromaWheel 
                 chromagram={chromagram} 
                 inputLevel={inputLevel} 
                 isMonitoring={isMonitoring} 
               />
-              <div style={{ width: '100%', maxWidth: '240px', margin: '8px 0 4px', opacity: isMonitoring ? 1 : 0.4, transition: 'opacity 0.2s ease' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', marginBottom: '4px' }}>
-                  <span>Mic Level</span>
-                  <span>{isMonitoring ? `${inputLevel}%` : '대기 중'}</span>
-                </div>
-                <div style={{ width: '100%', height: '4px', backgroundColor: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-                  <div 
-                    style={{ 
-                      width: isMonitoring ? `${inputLevel}%` : '0%', 
-                      height: '100%', 
-                      background: 'var(--primary)',
-                      borderRadius: '2px',
-                      transition: 'width 0.1s ease'
-                    }} 
-                  />
-                </div>
-              </div>
             </div>
           );
         case 'bpm':
@@ -359,6 +371,7 @@ function App() {
               confidence={confidence}
               alternativeKeys={alternativeKeys}
               isMonitoring={isMonitoring}
+              inputLevel={inputLevel}
               onStartMonitoring={startMonitoring}
               onStopMonitoring={stopMonitoring}
               hideHeader={true}
@@ -414,7 +427,7 @@ function App() {
           </div>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="header-controls">
           <button 
             onClick={toggleMonitoring} 
             className={isMonitoring ? 'btn-danger' : 'btn-primary'}
@@ -453,7 +466,7 @@ function App() {
               <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
               <path d="M8 21H3v-5" />
             </svg>
-            레이아웃 초기화
+            <span className="btn-text">레이아웃 초기화</span>
           </button>
           <ThemeToggle />
         </div>
