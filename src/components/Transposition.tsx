@@ -3,6 +3,7 @@ import { NOTE_NAMES } from '../utils/KeyFinder';
 
 interface TranspositionProps {
   detectedKey: string | null;
+  hideHeader?: boolean;
 }
 
 // Diatonic scales and chord definitions
@@ -35,10 +36,14 @@ function getDiatonicChords(root: number, isMajor: boolean): { degree: string; ch
 
 export function Transposition({ detectedKey }: TranspositionProps) {
   const [activeTab, setActiveTab] = useState<'target' | 'matrix'>('target');
-  const [targetKeyIndex, setTargetKeyIndex] = useState<number>(0); // Index in NOTE_NAMES (0=C)
+  const [targetKeyIndex, setTargetKeyIndex] = useState<number>(7); // Default to G (Index 7) for transpose example
   const [targetMode, setTargetMode] = useState<boolean>(true); // true = Major, false = Minor
 
-  // Parse detected key details
+  // Local state for manual source key when audio analysis is inactive
+  const [manualSourceIndex, setManualSourceIndex] = useState<number>(0); // Default C
+  const [manualSourceIsMajor, setManualSourceIsMajor] = useState<boolean>(true); // Default Major
+
+  // Parse detected key details if available
   let detectedRoot = -1;
   let detectedIsMajor = true;
 
@@ -49,31 +54,32 @@ export function Transposition({ detectedKey }: TranspositionProps) {
     detectedRoot = NOTE_NAMES.indexOf(note);
   }
 
-  // Chords for detected key
-  const detectedChords = detectedRoot !== -1 
-    ? getDiatonicChords(detectedRoot, detectedIsMajor) 
-    : [];
+  // Resolve active source key (use live detected key if available, otherwise use manual source key)
+  const isLive = detectedKey !== null;
+  const sourceRoot = isLive ? detectedRoot : manualSourceIndex;
+  const sourceIsMajor = isLive ? detectedIsMajor : manualSourceIsMajor;
+  const sourceKeyName = isLive 
+    ? detectedKey 
+    : `${NOTE_NAMES[manualSourceIndex]} ${manualSourceIsMajor ? 'Major' : 'Minor'}`;
 
-  // Chords for target key
+  // Diatonic chords for active source key
+  const sourceChords = getDiatonicChords(sourceRoot, sourceIsMajor);
+
+  // Diatonic chords for target key
   const targetChords = getDiatonicChords(targetKeyIndex, targetMode);
 
   // Calculate interval difference in semitones
-  let semitoneDiff = 0;
-  if (detectedRoot !== -1) {
-    semitoneDiff = (targetKeyIndex - detectedRoot + 12) % 12;
-    if (semitoneDiff > 6) {
-      semitoneDiff -= 12; // e.g. instead of +10, show -2 semitones
-    }
+  let semitoneDiff = (targetKeyIndex - sourceRoot + 12) % 12;
+  if (semitoneDiff > 6) {
+    semitoneDiff -= 12; // e.g. instead of +10, show -2 semitones
   }
 
   // Helper to get chord matrix for 12 keys
   const getMatrixRows = () => {
-    // Generate rows for all 12 roots in the same mode (Major or Minor) as detected key
-    const mode = detectedRoot !== -1 ? detectedIsMajor : true;
     return NOTE_NAMES.map((_, index) => {
-      const chords = getDiatonicChords(index, mode);
-      const keyName = `${NOTE_NAMES[index]} ${mode ? 'Major' : 'Minor'}`;
-      const isCurrent = detectedRoot === index && detectedIsMajor === mode;
+      const chords = getDiatonicChords(index, sourceIsMajor);
+      const keyName = `${NOTE_NAMES[index]} ${sourceIsMajor ? 'Major' : 'Minor'}`;
+      const isCurrent = sourceRoot === index;
       return {
         keyName,
         chords,
@@ -83,52 +89,92 @@ export function Transposition({ detectedKey }: TranspositionProps) {
   };
 
   const matrixRows = getMatrixRows();
-  const matrixDegrees = (detectedRoot !== -1 ? detectedIsMajor : true) 
-    ? CHORD_DEGREES_MAJOR 
-    : CHORD_DEGREES_MINOR;
+  const matrixDegrees = sourceIsMajor ? CHORD_DEGREES_MAJOR : CHORD_DEGREES_MINOR;
 
   return (
-    <div className="panel" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 700 }}>찬양팀 조바꿈 (Transposition)</h3>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', height: '100%' }}>
+      {/* Tabs / Sub-header bar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px', marginBottom: '4px' }}>
+        <div style={{ display: 'flex', gap: '6px' }}>
+          <span className={isLive ? 'live-badge' : 'hold-badge'} style={{ fontSize: '9px', padding: '2px 6px' }}>
+            {isLive ? (
+              <>
+                <span className="pulse-dot" />
+                실시간 분석 중
+              </>
+            ) : (
+              '수동 변환 모드'
+            )}
+          </span>
+        </div>
         
         {/* Toggle tabs */}
-        <div style={{ display: 'flex', gap: '4px', background: 'rgba(128,128,128,0.02)', padding: '3px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+        <div style={{ display: 'flex', gap: '2px', background: 'var(--border-color)', padding: '2px', borderRadius: '6px' }}>
           <button 
             onClick={() => setActiveTab('target')}
             className={`tab-btn ${activeTab === 'target' ? 'active' : ''}`}
-            style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '6px' }}
+            style={{ padding: '3px 8px', fontSize: '11px', borderRadius: '4px' }}
           >
             목표 키 변환
           </button>
           <button 
             onClick={() => setActiveTab('matrix')}
             className={`tab-btn ${activeTab === 'matrix' ? 'active' : ''}`}
-            style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '6px' }}
+            style={{ padding: '3px 8px', fontSize: '11px', borderRadius: '4px' }}
           >
-            12키 코드 매트릭스
+            12키 매트릭스
           </button>
         </div>
       </div>
 
-      {!detectedKey ? (
-        <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '24px 0', fontSize: '13px' }}>
-          실시간 키가 감지되면 조바꿈 코드 정보가 자동으로 활성화됩니다.
-        </p>
-      ) : (
-        <div>
-          {/* TAB 1: Target Key Transposer */}
-          {activeTab === 'target' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Select Target Key controls */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(128,128,128,0.01)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 600 }}>목표 키 선택:</span>
+      {/* Content Area */}
+      <div>
+        {/* TAB 1: Target Key Transposer */}
+        {activeTab === 'target' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            
+            {/* Input Controls */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(128,128,128,0.01)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              
+              {/* Source Key (Disabled if live, enabled if manual) */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>기준 키 (Source):</span>
+                {isLive ? (
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--primary)' }}>{sourceKeyName}</span>
+                ) : (
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <select 
+                      value={manualSourceIndex} 
+                      onChange={(e) => setManualSourceIndex(Number(e.target.value))} 
+                      className="select-input"
+                      style={{ padding: '3px 6px', fontSize: '11px' }}
+                    >
+                      {NOTE_NAMES.map((note, idx) => (
+                        <option key={idx} value={idx}>{note}</option>
+                      ))}
+                    </select>
+                    <select
+                      value={manualSourceIsMajor ? 'Major' : 'Minor'}
+                      onChange={(e) => setManualSourceIsMajor(e.target.value === 'Major')}
+                      className="select-input"
+                      style={{ padding: '3px 6px', fontSize: '11px' }}
+                    >
+                      <option value="Major">Major</option>
+                      <option value="Minor">Minor</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Target Key Selector */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>목표 키 (Target):</span>
+                <div style={{ display: 'flex', gap: '4px' }}>
                   <select 
                     value={targetKeyIndex} 
                     onChange={(e) => setTargetKeyIndex(Number(e.target.value))} 
                     className="select-input"
-                    style={{ padding: '6px 12px', fontSize: '13px' }}
+                    style={{ padding: '3px 6px', fontSize: '11px' }}
                   >
                     {NOTE_NAMES.map((note, idx) => (
                       <option key={idx} value={idx}>{note}</option>
@@ -138,101 +184,100 @@ export function Transposition({ detectedKey }: TranspositionProps) {
                     value={targetMode ? 'Major' : 'Minor'}
                     onChange={(e) => setTargetMode(e.target.value === 'Major')}
                     className="select-input"
-                    style={{ padding: '6px 12px', fontSize: '13px' }}
+                    style={{ padding: '3px 6px', fontSize: '11px' }}
                   >
                     <option value="Major">Major</option>
                     <option value="Minor">Minor</option>
                   </select>
                 </div>
-                
-                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                  이조 차이:{' '}
-                  <span style={{ fontWeight: 700, color: 'var(--secondary)' }}>
-                    {semitoneDiff === 0 ? '같음' : semitoneDiff > 0 ? `+${semitoneDiff} 키` : `${semitoneDiff} 키`}
-                  </span>
+              </div>
+
+              {/* Difference readout */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', borderTop: '1px dashed var(--border-color)', paddingTop: '6px', marginTop: '2px', color: 'var(--text-muted)' }}>
+                <span>이조 차이 (Interval Diff)</span>
+                <span style={{ fontWeight: 700, color: semitoneDiff === 0 ? 'var(--text-secondary)' : 'var(--secondary)' }}>
+                  {semitoneDiff === 0 ? '동일 키' : semitoneDiff > 0 ? `+${semitoneDiff} 반음 (Up)` : `${semitoneDiff} 반음 (Down)`}
+                </span>
+              </div>
+            </div>
+
+            {/* Transposition chord layout comparison */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              {/* Original Chords */}
+              <div>
+                <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                  기준 키 ({NOTE_NAMES[sourceRoot]} {sourceIsMajor ? 'maj' : 'min'})
+                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  {sourceChords.map((c, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '4px 8px', background: 'rgba(0,0,0,0.01)', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '12px' }}>
+                      <span style={{ width: '24px', fontWeight: 600, color: 'var(--text-muted)', fontSize: '10px' }}>{c.degree}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{c.chord}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Transposition chord layout comparison */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  {/* Original Chords */}
-                  <div>
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
-                      현재 감지된 키 ({detectedKey})
-                    </span>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      {detectedChords.map((c, idx) => (
-                        <div key={idx} style={{ display: 'flex', justifyItems: 'center', padding: '6px 10px', background: 'rgba(0,0,0,0.01)', border: '1px solid var(--border-color)', borderRadius: '6px', fontSize: '13px' }}>
-                          <span style={{ width: '30px', fontWeight: 600, color: 'var(--text-muted)' }}>{c.degree}</span>
-                          <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{c.chord}</span>
-                        </div>
-                      ))}
+              {/* Target Chords */}
+              <div>
+                <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--primary)', display: 'block', marginBottom: '6px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                  목표 키 ({NOTE_NAMES[targetKeyIndex]} {targetMode ? 'maj' : 'min'})
+                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  {targetChords.map((c, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', padding: '4px 8px', background: 'var(--primary-glow)', border: '1px solid var(--primary)', borderRadius: '6px', fontSize: '12px' }}>
+                      <span style={{ width: '24px', fontWeight: 600, color: 'var(--primary)', fontSize: '10px' }}>{c.degree}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{c.chord}</span>
                     </div>
-                  </div>
-
-                  {/* Target Chords */}
-                  <div>
-                    <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--primary)', display: 'block', marginBottom: '8px' }}>
-                      변환할 목표 키 ({NOTE_NAMES[targetKeyIndex]} {targetMode ? 'Major' : 'Minor'})
-                    </span>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      {targetChords.map((c, idx) => (
-                        <div key={idx} style={{ display: 'flex', justifyItems: 'center', padding: '6px 10px', background: 'var(--primary-glow)', border: '1px solid var(--primary)', borderRadius: '6px', fontSize: '13px' }}>
-                          <span style={{ width: '30px', fontWeight: 600, color: 'var(--primary)' }}>{c.degree}</span>
-                          <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{c.chord}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* TAB 2: 12-Key Code Matrix Table */}
-          {activeTab === 'matrix' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowX: 'auto' }}>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '4px' }}>
-                * 감지된 스케일 모드({detectedIsMajor ? 'Major' : 'Minor'}) 기준으로 모든 12개 키의 화성 코드를 표시합니다.
-              </span>
-              
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', fontSize: '13px', minWidth: '480px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '2px solid var(--border-color)' }}>
-                    <th style={{ padding: '8px', textAlign: 'left', fontWeight: 600 }}>Key</th>
-                    {matrixDegrees.map((deg, idx) => (
-                      <th key={idx} style={{ padding: '8px', fontWeight: 600 }}>{deg}</th>
+        {/* TAB 2: 12-Key Code Matrix Table */}
+        {activeTab === 'matrix' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', overflowX: 'auto' }}>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '2px' }}>
+              * {sourceIsMajor ? 'Major' : 'Minor'} 스케일 모드 기준 12개 키 화성 표
+            </span>
+            
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', fontSize: '11px', minWidth: '400px' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                  <th style={{ padding: '6px 4px', textAlign: 'left', fontWeight: 600 }}>Key</th>
+                  {matrixDegrees.map((deg, idx) => (
+                    <th key={idx} style={{ padding: '6px 2px', fontWeight: 600 }}>{deg}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {matrixRows.map((row, idx) => (
+                  <tr 
+                    key={idx} 
+                    style={{ 
+                      borderBottom: '1px solid var(--border-color)',
+                      background: row.isCurrent ? 'var(--primary-glow)' : 'transparent',
+                      fontWeight: row.isCurrent ? 700 : 400,
+                      borderLeft: row.isCurrent ? '3px solid var(--primary)' : 'none'
+                    }}
+                  >
+                    <td style={{ padding: '6px 4px', textAlign: 'left', color: row.isCurrent ? 'var(--primary)' : 'var(--text-primary)' }}>
+                      {row.keyName.replace(' Major', '').replace(' Minor', row.keyName.includes('Major') ? '' : 'm')}
+                    </td>
+                    {row.chords.map((c, cIdx) => (
+                      <td key={cIdx} style={{ padding: '6px 2px', color: row.isCurrent ? 'var(--primary)' : 'var(--text-secondary)' }}>
+                        {c.chord}
+                      </td>
                     ))}
                   </tr>
-                </thead>
-                <tbody>
-                  {matrixRows.map((row, idx) => (
-                    <tr 
-                      key={idx} 
-                      style={{ 
-                        borderBottom: '1px solid var(--border-color)',
-                        background: row.isCurrent ? 'var(--primary-glow)' : 'transparent',
-                        fontWeight: row.isCurrent ? 700 : 400,
-                        borderLeft: row.isCurrent ? '3px solid var(--primary)' : 'none'
-                      }}
-                    >
-                      <td style={{ padding: '8px', textAlign: 'left', color: row.isCurrent ? 'var(--primary)' : 'var(--text-primary)' }}>
-                        {row.keyName}
-                      </td>
-                      {row.chords.map((c, cIdx) => (
-                        <td key={cIdx} style={{ padding: '8px', color: row.isCurrent ? 'var(--primary)' : 'var(--text-secondary)' }}>
-                          {c.chord}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

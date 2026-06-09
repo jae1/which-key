@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import { useAudioEngine } from './hooks/useAudioEngine';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -8,6 +8,120 @@ import { BpmDisplay } from './components/BpmDisplay';
 import { Metronome } from './components/Metronome';
 import { Transposition } from './components/Transposition';
 import { AdSlot } from './components/AdSlot';
+
+interface Widget {
+  id: string;
+  title: string;
+  isCollapsed: boolean;
+}
+
+function WidgetHeader({ 
+  widget, 
+  rowKey, 
+  index, 
+  totalInRow, 
+  onToggleCollapse, 
+  onMove,
+  onDragStart,
+  isMonitoring,
+  detectedKey,
+  bpm
+}: {
+  widget: Widget;
+  rowKey: 'top' | 'bottom';
+  index: number;
+  totalInRow: number;
+  onToggleCollapse: (id: string) => void;
+  onMove: (id: string, direction: 'left' | 'right') => void;
+  onDragStart: (id: string, sourceRow: 'top' | 'bottom') => void;
+  isMonitoring: boolean;
+  detectedKey: string | null;
+  bpm: number | null;
+}) {
+  // Determine if this widget is active and has live data
+  const isWidgetLive = isMonitoring && (
+    (widget.id === 'key' && detectedKey !== null) ||
+    (widget.id === 'chroma') ||
+    (widget.id === 'bpm' && bpm !== null)
+  );
+
+  const isWidgetHold = !isMonitoring && (
+    (widget.id === 'key' && detectedKey !== null) ||
+    (widget.id === 'bpm' && bpm !== null)
+  );
+
+  return (
+    <div 
+      draggable
+      onDragStart={() => onDragStart(widget.id, rowKey)}
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottom: widget.isCollapsed ? 'none' : '1px solid var(--border-color)',
+        paddingBottom: widget.isCollapsed ? '0' : '8px',
+        marginBottom: widget.isCollapsed ? '0' : '12px',
+        cursor: 'grab',
+        userSelect: 'none'
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ color: 'var(--text-muted)', fontSize: '13px', fontWeight: 'bold' }}>⋮⋮</span>
+        <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>{widget.title}</h3>
+        {isWidgetLive && (
+          <span className="live-badge" style={{ fontSize: '9px', padding: '1px 5px', gap: '4px' }}>
+            <span className="pulse-dot" />
+            LIVE
+          </span>
+        )}
+        {isWidgetHold && (
+          <span className="hold-badge" style={{ fontSize: '9px', padding: '1px 5px' }}>
+            HOLD
+          </span>
+        )}
+      </div>
+      
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={(e) => e.stopPropagation()}>
+        {index > 0 && (
+          <button 
+            onClick={() => onMove(widget.id, 'left')}
+            style={{ padding: '2px 4px', fontSize: '11px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            title="왼쪽으로 이동"
+          >
+            ←
+          </button>
+        )}
+        {index < totalInRow - 1 && (
+          <button 
+            onClick={() => onMove(widget.id, 'right')}
+            style={{ padding: '2px 4px', fontSize: '11px', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            title="오른쪽으로 이동"
+          >
+            →
+          </button>
+        )}
+        
+        <button
+          onClick={() => onToggleCollapse(widget.id)}
+          style={{ 
+            padding: '2px 6px', 
+            fontSize: '11px', 
+            background: 'var(--border-color)', 
+            border: 'none', 
+            color: 'var(--text-primary)',
+            borderRadius: '4px',
+            marginLeft: '4px',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+          title={widget.isCollapsed ? '펼치기' : '접기'}
+        >
+          {widget.isCollapsed ? '+' : '−'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const {
@@ -24,12 +138,138 @@ function App() {
     tapTempo,
     resetBpm,
     inputLevel,
-    errorMsg,
     getAudioContext,
   } = useAudioEngine();
 
-  // Dialog states for Google AdSense compliance (Privacy Policy, About, Terms)
   const [activeModal, setActiveModal] = useState<'privacy' | 'about' | 'terms' | null>(null);
+
+  // 2-tier layout layout v7 (chroma/key top, transposition/bpm/metronome bottom)
+  const [layout, setLayout] = useState<{
+    top: Widget[];
+    bottom: Widget[];
+  }>(() => {
+    const saved = localStorage.getItem('dashboard_layout_v7');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return {
+      top: [
+        { id: 'chroma', title: '크로마 휠 (Chroma Wheel)', isCollapsed: false },
+        { id: 'key', title: '감지된 키 (Key)', isCollapsed: false }
+      ],
+      bottom: [
+        { id: 'transposition', title: '조바꿈 (Transpose)', isCollapsed: false },
+        { id: 'bpm', title: '템포 (BPM)', isCollapsed: false },
+        { id: 'metronome', title: '메트로놈', isCollapsed: false }
+      ]
+    };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('dashboard_layout_v7', JSON.stringify(layout));
+  }, [layout]);
+
+  const [draggedWidgetId, setDraggedWidgetId] = useState<string | null>(null);
+  const [draggedSourceRow, setDraggedSourceRow] = useState<'top' | 'bottom' | null>(null);
+
+  const handleDragStart = (id: string, sourceRow: 'top' | 'bottom') => {
+    setDraggedWidgetId(id);
+    setDraggedSourceRow(sourceRow);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (targetRow: 'top' | 'bottom', targetIndex: number) => {
+    if (!draggedWidgetId || !draggedSourceRow) return;
+    // Disallow dragging across rows to keep layout structured
+    if (draggedSourceRow !== targetRow) return;
+
+    setLayout(prev => {
+      const list = [...prev[targetRow]];
+      const sourceIndex = list.findIndex(w => w.id === draggedWidgetId);
+      if (sourceIndex === -1) return prev;
+
+      // Swap the source and target widgets
+      const temp = list[sourceIndex];
+      list[sourceIndex] = list[targetIndex];
+      list[targetIndex] = temp;
+
+      return {
+        ...prev,
+        [targetRow]: list
+      };
+    });
+
+    setDraggedWidgetId(null);
+    setDraggedSourceRow(null);
+  };
+
+  const toggleCollapse = useCallback((id: string) => {
+    setLayout(prev => {
+      const updated = { ...prev };
+      for (const rowKey of ['top', 'bottom'] as const) {
+        updated[rowKey] = updated[rowKey].map(w => 
+          w.id === id ? { ...w, isCollapsed: !w.isCollapsed } : w
+        );
+      }
+      return updated;
+    });
+  }, []);
+
+  const moveWidget = useCallback((id: string, direction: 'left' | 'right') => {
+    setLayout(prev => {
+      const updated = {
+        top: [...prev.top],
+        bottom: [...prev.bottom],
+      };
+      
+      let currentRowKey: 'top' | 'bottom' | null = null;
+      let currentIndex = -1;
+      
+      for (const rowKey of ['top', 'bottom'] as const) {
+        const idx = updated[rowKey].findIndex(w => w.id === id);
+        if (idx !== -1) {
+          currentRowKey = rowKey;
+          currentIndex = idx;
+          break;
+        }
+      }
+      
+      if (!currentRowKey || currentIndex === -1) return prev;
+      
+      const list = updated[currentRowKey];
+      const targetIndex = direction === 'left' ? currentIndex - 1 : currentIndex + 1;
+      
+      if (targetIndex >= 0 && targetIndex < list.length) {
+        // Swap
+        const temp = list[currentIndex];
+        list[currentIndex] = list[targetIndex];
+        list[targetIndex] = temp;
+      }
+      
+      return updated;
+    });
+  }, []);
+
+  const handleResetLayout = () => {
+    const defaultLayout = {
+      top: [
+        { id: 'chroma', title: '크로마 휠 (Chroma Wheel)', isCollapsed: false },
+        { id: 'key', title: '감지된 키 (Key)', isCollapsed: false }
+      ],
+      bottom: [
+        { id: 'transposition', title: '조바꿈 (Transpose)', isCollapsed: false },
+        { id: 'bpm', title: '템포 (BPM)', isCollapsed: false },
+        { id: 'metronome', title: '메트로놈', isCollapsed: false }
+      ]
+    };
+    setLayout(defaultLayout);
+    localStorage.removeItem('dashboard_layout_v7');
+  };
 
   const toggleMonitoring = () => {
     if (isMonitoring) {
@@ -41,9 +281,124 @@ function App() {
 
   const handleCloseModal = () => setActiveModal(null);
 
+  const renderWidget = (widget: Widget, rowKey: 'top' | 'bottom', index: number, totalInRow: number) => {
+    const header = (
+      <WidgetHeader 
+        widget={widget}
+        rowKey={rowKey}
+        index={index}
+        totalInRow={totalInRow}
+        onToggleCollapse={toggleCollapse}
+        onMove={moveWidget}
+        onDragStart={handleDragStart}
+        isMonitoring={isMonitoring}
+        detectedKey={detectedKey}
+        bpm={bpm}
+      />
+    );
+
+    if (widget.isCollapsed) {
+      return (
+        <div 
+          key={widget.id} 
+          className="panel" 
+          style={{ padding: '12px 16px' }}
+          onDragOver={handleDragOver}
+          onDrop={() => handleDrop(rowKey, index)}
+        >
+          {header}
+        </div>
+      );
+    }
+
+    const innerContent = (() => {
+      switch (widget.id) {
+        case 'chroma':
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+              <ChromaWheel 
+                chromagram={chromagram} 
+                inputLevel={inputLevel} 
+                isMonitoring={isMonitoring} 
+              />
+              <div style={{ width: '100%', maxWidth: '240px', margin: '8px 0 4px', opacity: isMonitoring ? 1 : 0.4, transition: 'opacity 0.2s ease' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                  <span>Mic Level</span>
+                  <span>{isMonitoring ? `${inputLevel}%` : '대기 중'}</span>
+                </div>
+                <div style={{ width: '100%', height: '4px', backgroundColor: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+                  <div 
+                    style={{ 
+                      width: isMonitoring ? `${inputLevel}%` : '0%', 
+                      height: '100%', 
+                      background: 'var(--primary)',
+                      borderRadius: '2px',
+                      transition: 'width 0.1s ease'
+                    }} 
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        case 'bpm':
+          return (
+            <BpmDisplay 
+              bpm={bpm}
+              isBeat={isBeat}
+              manualBpm={manualBpm}
+              tapTempo={tapTempo}
+              resetBpm={resetBpm}
+              isMonitoring={isMonitoring}
+              hideHeader={true}
+            />
+          );
+        case 'key':
+          return (
+            <KeyDisplay 
+              detectedKey={detectedKey}
+              confidence={confidence}
+              alternativeKeys={alternativeKeys}
+              isMonitoring={isMonitoring}
+              onStartMonitoring={startMonitoring}
+              onStopMonitoring={stopMonitoring}
+              hideHeader={true}
+            />
+          );
+        case 'metronome':
+          return (
+            <Metronome 
+              currentBpm={manualBpm > 0 ? manualBpm : (bpm || 120)}
+              getAudioContext={getAudioContext}
+              hideHeader={true}
+            />
+          );
+        case 'transposition':
+          return (
+            <Transposition detectedKey={detectedKey} hideHeader={true} />
+          );
+        default:
+          return null;
+      }
+    })();
+
+    return (
+      <div 
+        key={widget.id} 
+        className="panel" 
+        style={{ display: 'flex', flexDirection: 'column' }}
+        onDragOver={handleDragOver}
+        onDrop={() => handleDrop(rowKey, index)}
+      >
+        {header}
+        <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+          {innerContent}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="app-container">
-      {/* 1. App Header */}
       <header className="app-header">
         <div className="logo-area">
           <div className="logo-icon">
@@ -60,130 +415,65 @@ function App() {
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button 
+            onClick={toggleMonitoring} 
+            className={isMonitoring ? 'btn-danger' : 'btn-primary'}
+            style={{ 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              padding: '6px 14px', 
+              borderRadius: '8px',
+              boxShadow: isMonitoring ? '0 0 10px rgba(239, 68, 68, 0.2)' : 'none'
+            }}
+          >
+            {isMonitoring ? (
+              <>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '2px' }}>
+                  <rect x="4" y="4" width="16" height="16" rx="2" />
+                </svg>
+                분석 중지
+              </>
+            ) : (
+              <>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '2px' }}>
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="23"/>
+                  <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+                분석 시작
+              </>
+            )}
+          </button>
+
+          <button onClick={handleResetLayout} className="btn-reset-layout" title="모든 패널 크기와 위치를 기본값으로 되돌립니다.">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+              <path d="M16 3h5v5" />
+              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+              <path d="M8 21H3v-5" />
+            </svg>
+            레이아웃 초기화
+          </button>
           <ThemeToggle />
         </div>
       </header>
 
-      {/* 2. Error Message Area */}
-      {errorMsg && (
-        <div style={{ 
-          background: 'var(--danger-glow)', 
-          border: '1px solid var(--danger)', 
-          color: 'var(--text-primary)', 
-          padding: '12px 16px', 
-          borderRadius: '12px',
-          fontSize: '14px',
-          fontWeight: 500,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          {errorMsg}
+      <main style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* Top tier - 2 columns */}
+        <div className="app-grid-top">
+          {layout.top.map((w, idx) => renderWidget(w, 'top', idx, layout.top.length))}
         </div>
-      )}
-
-      {/* 3. Main Dashboard Grid */}
-      <main className="app-grid">
         
-        {/* Column 1: 오디오 감지 및 BPM */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <div className="panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '12px' }}>크로마 휠 (Chroma Wheel)</h2>
-            <ChromaWheel 
-              chromagram={chromagram} 
-              inputLevel={inputLevel} 
-              isMonitoring={isMonitoring} 
-            />
-            {isMonitoring && (
-              <div style={{ width: '100%', maxWidth: '240px', margin: '8px 0 16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', marginBottom: '4px' }}>
-                  <span>Mic Level</span>
-                  <span>{inputLevel}%</span>
-                </div>
-                <div style={{ width: '100%', height: '4px', backgroundColor: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
-                  <div 
-                    style={{ 
-                      width: `${inputLevel}%`, 
-                      height: '100%', 
-                      background: 'var(--primary)',
-                      borderRadius: '2px',
-                      transition: 'width 0.1s ease'
-                    }} 
-                  />
-                </div>
-              </div>
-            )}
-            <button
-              onClick={toggleMonitoring}
-              className={isMonitoring ? 'btn-danger' : 'btn-primary'}
-              style={{ 
-                padding: '10px 20px', 
-                fontSize: '14px', 
-                borderRadius: '8px',
-                width: '100%',
-                maxWidth: '240px'
-              }}
-            >
-              {isMonitoring ? (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="4" y="4" width="16" height="16" rx="2" />
-                  </svg>
-                  분석 중지
-                </>
-              ) : (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                    <line x1="12" y1="19" x2="12" y2="23"/>
-                  </svg>
-                  분석 시작
-                </>
-              )}
-            </button>
-          </div>
-
-          <BpmDisplay 
-            bpm={bpm}
-            isBeat={isBeat}
-            manualBpm={manualBpm}
-            tapTempo={tapTempo}
-            resetBpm={resetBpm}
-            isMonitoring={isMonitoring}
-          />
-        </div>
-
-        {/* Column 2: 감지된 키 및 메트로놈 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <KeyDisplay 
-            detectedKey={detectedKey}
-            confidence={confidence}
-            alternativeKeys={alternativeKeys}
-            isMonitoring={isMonitoring}
-          />
-          <Metronome 
-            currentBpm={manualBpm > 0 ? manualBpm : (bpm || 120)}
-            getAudioContext={getAudioContext}
-          />
-        </div>
-
-        {/* Column 3: 조바꿈 계산기 & 광고 */}
-        <div className="grid-col-3" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <Transposition detectedKey={detectedKey} />
-          <AdSlot type="sidebar" />
+        {/* Bottom tier - 3 columns */}
+        <div className="app-grid-bottom">
+          {layout.bottom.map((w, idx) => renderWidget(w, 'bottom', idx, layout.bottom.length))}
         </div>
       </main>
 
-      {/* Bottom Horizontal Ad Slot */}
       <AdSlot type="horizontal" />
 
-      {/* 4. Footer & AdSense Compliance Policies */}
+      {/* Footer & AdSense Compliance Policies */}
       <footer className="app-footer">
         <div className="footer-links">
           <a href="#about" onClick={(e) => { e.preventDefault(); setActiveModal('about'); }}>서비스 소개</a>
@@ -194,7 +484,7 @@ function App() {
         <p style={{ fontSize: '11px', marginTop: '6px', opacity: 0.4 }}>모든 오디오 데이터는 브라우저 내부에서 실시간 로컬 분석을 거치며 서버로 전송되지 않습니다. (100% On-Device)</p>
       </footer>
 
-      {/* 5. Modals for Policy Compliance (Google AdSense Requirements) */}
+      {/* Modals for Policy Compliance (Google AdSense Requirements) */}
       {activeModal && (
         <div style={{
           position: 'fixed',

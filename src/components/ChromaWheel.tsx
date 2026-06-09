@@ -180,11 +180,11 @@ export function ChromaWheel({ chromagram, inputLevel, isMonitoring }: ChromaWhee
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', padding: '4px 0' }}>
       <canvas
         ref={canvasRef}
-        width={280}
-        height={280}
+        width={240}
+        height={240}
         style={{
           width: '100%',
-          maxWidth: '280px',
+          maxWidth: '240px',
           height: 'auto',
           aspectRatio: '1 / 1',
         }}

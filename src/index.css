@@ -137,15 +137,31 @@ p {
   border: 1px solid var(--panel-border);
   border-radius: 12px;
   box-shadow: var(--panel-shadow);
-  padding: 24px;
+  padding: 20px;
   position: relative;
   overflow: hidden;
   flex-shrink: 0; /* Prevent collapsing under any flex layouts */
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease,
+              box-shadow 0.2s ease,
+              opacity 0.2s ease;
 }
 
 .panel:hover {
   border-color: var(--panel-border-hover);
 }
+
+.panel.dragging {
+  opacity: 0.15;
+  border: 2px dashed var(--primary) !important;
+  box-shadow: none !important;
+  pointer-events: none; /* Avoid mouse interference during dragging */
+}
+
+
+
 
 /* Buttons */
 button, .btn {
@@ -303,33 +319,102 @@ button:disabled, .btn:disabled {
 }
 
 /* Grid Layout */
-.app-grid {
+.app-grid-top, .app-grid-bottom {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
   align-items: start; /* Prevent cards from stretching vertically */
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
-  .app-grid {
+@media (min-width: 768px) {
+  .app-grid-top {
     grid-template-columns: 1fr 1fr;
   }
-  .grid-col-3 {
-    grid-column: span 2;
-    display: grid !important;
+  .app-grid-bottom {
     grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-  .grid-col-3 > :last-child {
-    grid-column: span 2;
   }
 }
 
 @media (min-width: 1025px) {
-  .app-grid {
-    grid-template-columns: 0.95fr 1.1fr 0.95fr;
+  .app-grid-bottom {
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
+
+/* Live & Hold Badges */
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-glow);
+  padding: 3px 8px;
+  border-radius: 9999px;
+  border: 1px solid rgba(var(--primary-rgb), 0.15);
+  line-height: 1;
+}
+
+.hold-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(128,128,128,0.05);
+  padding: 3px 8px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-color);
+  line-height: 1;
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.4);
+  animation: pulseDot 1.5s infinite;
+}
+
+@keyframes pulseDot {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 5px rgba(var(--primary-rgb), 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0);
+  }
+}
+
+
+.btn-reset-layout {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-reset-layout:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+  background: rgba(var(--primary-rgb), 0.05);
+}
+
 
 /* Form controls */
 .select-input {
@@ -365,4 +450,14 @@ button:disabled, .btn:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
 }

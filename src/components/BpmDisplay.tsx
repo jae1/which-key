@@ -7,6 +7,7 @@ interface BpmDisplayProps {
   tapTempo: () => void;
   resetBpm: () => void;
   isMonitoring: boolean;
+  hideHeader?: boolean;
 }
 
 export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonitoring }: BpmDisplayProps) {
@@ -21,21 +22,21 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
   }, [isBeat]);
 
   return (
-    <div className="panel" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-secondary)' }}>템포 (BPM)</h3>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', height: '100%' }}>
+      {/* Small top utility bar for resetting - fixed height to prevent layout shifts */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', height: '24px', marginBottom: '4px' }}>
         {(bpm || manualBpm > 0) && (
           <button 
             onClick={resetBpm} 
             className="btn-secondary" 
-            style={{ padding: '3px 6px', fontSize: '10px', borderRadius: '4px' }}
+            style={{ padding: '3px 8px', fontSize: '10px', borderRadius: '4px' }}
           >
-            초기화
+            기록 초기화
           </button>
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', flexGrow: 1, alignItems: 'center', marginBottom: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', flexGrow: 1, alignItems: 'center', marginBottom: '8px' }}>
         {/* Live Auto BPM */}
         <div style={{ 
           display: 'flex', 
@@ -59,10 +60,10 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
             margin: '4px 0',
             lineHeight: 1
           }}>
-            {isMonitoring && bpm ? bpm : '--'}
+            {bpm ? bpm : '--'}
           </div>
           <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-            {isMonitoring ? '자동 비트 감지' : '대기 중'}
+            {isMonitoring ? '자동 비트 감지' : bpm ? '마지막 감지값' : '대기 중'}
           </span>
         </div>
 
@@ -106,7 +107,7 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
               width: '10px', 
               height: '10px', 
               borderRadius: '50%', 
-              backgroundColor: isMonitoring && bpm ? 'var(--secondary)' : 'var(--text-muted)'
+              backgroundColor: bpm ? 'var(--secondary)' : 'var(--text-muted)'
             }} 
           />
           <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
@@ -118,8 +119,8 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
           onClick={tapTempo}
           className="btn-primary"
           style={{ 
-            padding: '12px', 
-            fontSize: '15px', 
+            padding: '10px', 
+            fontSize: '14px', 
             borderRadius: '8px',
             background: 'var(--primary)'
           }}
