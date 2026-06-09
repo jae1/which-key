@@ -171,6 +171,7 @@ function App() {
   } = useAudioEngine();
 
   const [isGuideCollapsed, setIsGuideCollapsed] = useState(true);
+  const [view, setView] = useState<'dashboard' | 'about' | 'privacy' | 'terms'>('dashboard');
 
   // 2-tier layout layout v9 (chroma/key top, transposition/bpm/metronome bottom)
   const [layout, setLayout] = useState<{
@@ -413,7 +414,7 @@ function App() {
   return (
     <div className="app-container">
       <header className="app-header">
-        <div className="logo-area">
+        <div className="logo-area" onClick={() => setView('dashboard')} style={{ cursor: 'pointer' }}>
           <div className="logo-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 18V5l12-2v13" />
@@ -473,14 +474,98 @@ function App() {
       </header>
 
       <main style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {/* Top tier - 2 columns */}
-        <div className="app-grid-top">
-          {layout.top.map((w, idx) => renderWidget(w, 'top', idx, layout.top.length))}
+        {/* Dashboard View */}
+        <div style={{ display: view === 'dashboard' ? 'flex' : 'none', flexDirection: 'column', gap: '24px' }}>
+          {/* Top tier - 2 columns */}
+          <div className="app-grid-top">
+            {layout.top.map((w, idx) => renderWidget(w, 'top', idx, layout.top.length))}
+          </div>
+          
+          {/* Bottom tier - 3 columns */}
+          <div className="app-grid-bottom">
+            {layout.bottom.map((w, idx) => renderWidget(w, 'bottom', idx, layout.bottom.length))}
+          </div>
         </div>
-        
-        {/* Bottom tier - 3 columns */}
-        <div className="app-grid-bottom">
-          {layout.bottom.map((w, idx) => renderWidget(w, 'bottom', idx, layout.bottom.length))}
+
+        {/* About View */}
+        <div style={{ display: view === 'about' ? 'block' : 'none' }} className="panel">
+          <button onClick={() => setView('dashboard')} className="btn-secondary" style={{ marginBottom: '20px' }}>
+            &larr; Back to Dashboard
+          </button>
+          <h2 style={{ fontSize: '24px', marginBottom: '16px', color: 'var(--primary)' }}>About WhichKey</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '14px', lineHeight: '1.7', color: 'var(--text-secondary)' }}>
+            <p>
+              <strong>WhichKey</strong> is a web-based smart audio analysis utility suite designed for musicians, worship leaders, producers, and students. By analyzing microphone or system audio input in real-time, it instantly extracts and displays key musical features.
+            </p>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '12px' }}>Core Features</h3>
+            <ul style={{ paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <li><strong>Real-time Key Detection</strong>: Instantly analyzes the pitch and harmonic profile of the music playing in your room to estimate the key (e.g., C Major, A Minor) along with its relative, parallel, and closely related keys.</li>
+              <li><strong>Real-time BPM Tracking & Tap Tempo</strong>: Analyzes rhythmic transient energy to track the tempo (BPM) of incoming audio. Includes a large-target manual Tap Tempo interface for instant BPM measurement.</li>
+              <li><strong>Smart Metronome</strong>: Synchronizes with the detected or manual BPM, supporting customizable time signatures, subdivisions, and audio-synthesized click tracks.</li>
+              <li><strong>12-Key Chord Matrix & Transposition</strong>: Instantly maps out the 7 diatonic chords for any key, allowing seamless transposition and capo calculation for guitarists and keyboardists.</li>
+            </ul>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '12px' }}>Technical Details</h3>
+            <p style={{ margin: 0 }}>
+              The application performs all digital signal processing (DSP) locally inside your web browser using the <strong>Web Audio API</strong> and real-time <strong>Fast Fourier Transform (FFT)</strong>. No audio data is ever recorded or uploaded to external servers, ensuring 100% on-device privacy and zero data usage.
+            </p>
+          </div>
+        </div>
+
+        {/* Privacy Policy View */}
+        <div style={{ display: view === 'privacy' ? 'block' : 'none' }} className="panel">
+          <button onClick={() => setView('dashboard')} className="btn-secondary" style={{ marginBottom: '20px' }}>
+            &larr; Back to Dashboard
+          </button>
+          <h2 style={{ fontSize: '24px', marginBottom: '16px', color: 'var(--primary)' }}>Privacy Policy</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '14px', lineHeight: '1.7', color: 'var(--text-secondary)' }}>
+            <p>
+              This Privacy Policy describes how WhichKey (referred to as "the Service") processes audio data and handles user privacy.
+            </p>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '12px' }}>1. Audio Data Processing & Local Execution</h3>
+            <p style={{ margin: 0 }}>
+              To analyze musical key and BPM in real-time, the Service requests permission to access your device's microphone (Audio Input). The incoming audio stream is processed entirely inside your browser (Client-Side memory) using real-time Fast Fourier Transform (FFT) analysis, and is instantly discarded. No audio data or recording is ever saved, stored, uploaded to external servers, or shared with third parties.
+            </p>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '12px' }}>2. Cookies and Advertisements (Google AdSense)</h3>
+            <p style={{ margin: 0 }}>
+              The Service may display advertisements served by Google AdSense to sustain operations. Google and other third-party vendors use cookies to serve personalized ads based on your previous visits to this and other websites. You can opt-out of personalized advertising by visiting Google's <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>Ads Settings</a> page.
+            </p>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '12px' }}>3. Analytics and Statistics</h3>
+            <p style={{ margin: 0 }}>
+              To monitor traffic and improve service quality, we may use anonymous analytics tools (such as Google Analytics). The collected information is strictly non-personal and aggregated (e.g., browser type, visit duration, screen resolution).
+            </p>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '12px' }}>4. Changes to this Policy</h3>
+            <p style={{ margin: 0 }}>
+              We reserve the right to modify this Privacy Policy. Any updates will be posted on this page.
+            </p>
+          </div>
+        </div>
+
+        {/* Terms of Service View */}
+        <div style={{ display: view === 'terms' ? 'block' : 'none' }} className="panel">
+          <button onClick={() => setView('dashboard')} className="btn-secondary" style={{ marginBottom: '20px' }}>
+            &larr; Back to Dashboard
+          </button>
+          <h2 style={{ fontSize: '24px', marginBottom: '16px', color: 'var(--primary)' }}>Terms of Service</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '14px', lineHeight: '1.7', color: 'var(--text-secondary)' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>Article 1 (Purpose)</h3>
+            <p style={{ margin: 0 }}>
+              These Terms govern your use of the WhichKey web application and its utilities (real-time key detection, BPM tracking, metronome, and transposition tool).
+            </p>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '12px' }}>Article 2 (Usage & Access)</h3>
+            <p style={{ margin: 0 }}>
+              1. The Service is free to use and does not require registration or user accounts.<br />
+              2. Microphone permission is required to run the real-time pitch and BPM detection algorithms. Users can revoke this permission through browser settings at any time.
+            </p>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '12px' }}>Article 3 (Disclaimers & Limitations of Liability)</h3>
+            <p style={{ margin: 0 }}>
+              1. The detected keys, chord maps, and BPM metrics are algorithmic estimates based on digital signal analysis. Environmental noise, room acoustics, or harmonic overtones can lead to estimation margins. The Service does not guarantee 100% accuracy, and the final musical decisions remain the user's responsibility.<br />
+              2. The Service is provided "as is" without warranty of any kind. The provider is not liable for any direct or indirect damages resulting from the use or inability to use this website.
+            </p>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '12px' }}>Article 4 (Intellectual Property)</h3>
+            <p style={{ margin: 0 }}>
+              All visual assets, source code, logos, design configurations, and proprietary scripts are the intellectual property of WhichKey and protected by copyright laws.
+            </p>
+          </div>
         </div>
       </main>
 
@@ -606,9 +691,9 @@ function App() {
       {/* Footer & AdSense Compliance Policies */}
       <footer className="app-footer">
         <div className="footer-links">
-          <a href="/about.html">About</a>
-          <a href="/privacy.html">Privacy Policy</a>
-          <a href="/terms.html">Terms of Service</a>
+          <a href="#about" onClick={(e) => { e.preventDefault(); setView('about'); window.scrollTo(0, 0); }}>About</a>
+          <a href="#privacy" onClick={(e) => { e.preventDefault(); setView('privacy'); window.scrollTo(0, 0); }}>Privacy Policy</a>
+          <a href="#terms" onClick={(e) => { e.preventDefault(); setView('terms'); window.scrollTo(0, 0); }}>Terms of Service</a>
         </div>
         <p>&copy; {new Date().getFullYear()} WhichKey. All Rights Reserved.</p>
         <p style={{ fontSize: '11px', marginTop: '6px', opacity: 0.4 }}>All audio data is analyzed locally in real-time inside your browser and is never sent to a server (100% On-Device).</p>
