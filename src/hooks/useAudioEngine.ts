@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { findKey, KeyPrediction } from '../utils/KeyFinder';
+import { findKey } from '../utils/KeyFinder';
+import type { KeyPrediction } from '../utils/KeyFinder';
 import { BpmTracker } from '../utils/BpmTracker';
 
 export function useAudioEngine() {
