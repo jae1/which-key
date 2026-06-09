@@ -67,47 +67,47 @@ export function KeyDisplay({
   // 1. Idle state (no key detected and not monitoring)
   if (!detectedKey && !isMonitoring) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '380px', width: '100%', padding: '4px 0' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, textAlign: 'center', padding: '12px 0 0' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '290px', width: '100%', padding: '2px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, textAlign: 'center', padding: '8px 0 0' }}>
           <div style={{
-            width: '56px',
-            height: '56px',
+            width: '44px',
+            height: '44px',
             borderRadius: '50%',
             background: 'var(--primary-glow)',
             color: 'var(--primary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '12px',
+            marginBottom: '8px',
             border: '1px solid var(--panel-border)',
             boxShadow: 'var(--shadow-sm)'
           }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
               <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
               <line x1="12" y1="19" x2="12" y2="23"/>
               <line x1="8" y1="23" x2="16" y2="23"/>
             </svg>
           </div>
-          <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', fontSize: '15px' }}>오디오 입력 대기 중</h4>
-          <p style={{ fontSize: '13px', maxWidth: '280px', color: 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.4 }}>
+          <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px', fontSize: '14px' }}>오디오 입력 대기 중</h4>
+          <p style={{ fontSize: '12px', maxWidth: '240px', color: 'var(--text-secondary)', marginBottom: '6px', lineHeight: 1.3 }}>
             마이크 권한을 수락하고 분석을 시작하면 주변 기기나 연주 소리를 실시간으로 분석합니다.
           </p>
         </div>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
           {renderMicLevel()}
           <button
             onClick={onStartMonitoring}
             className="btn-primary"
             style={{
               width: '100%',
-              padding: '10px 24px',
-              fontSize: '14px',
+              padding: '8px 16px',
+              fontSize: '13px',
               fontWeight: 600,
               borderRadius: '8px',
-              height: '40px',
-              boxShadow: '0 4px 12px rgba(var(--primary-rgb), 0.2)'
+              height: '36px',
+              boxShadow: '0 4px 12px rgba(var(--primary-rgb), 0.15)'
             }}
           >
             실시간 키 감지 시작
@@ -120,34 +120,34 @@ export function KeyDisplay({
   // 2. Monitoring started, but no key detected yet
   if (isMonitoring && !detectedKey) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '380px', width: '100%', padding: '4px 0' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, textAlign: 'center', padding: '12px 0 0' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '290px', width: '100%', padding: '2px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, textAlign: 'center', padding: '8px 0 0' }}>
           <div className="loader-spin" style={{
-            width: '40px',
-            height: '40px',
+            width: '32px',
+            height: '32px',
             borderRadius: '50%',
-            border: '3px solid var(--border-color)',
+            border: '2.5px solid var(--border-color)',
             borderTopColor: 'var(--primary)',
-            marginBottom: '16px'
+            marginBottom: '12px'
           }} />
-          <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', fontSize: '15px' }}>음향 신호 대기 중...</h4>
-          <p style={{ fontSize: '13px', maxWidth: '280px', color: 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.4 }}>
+          <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px', fontSize: '14px' }}>음향 신호 대기 중...</h4>
+          <p style={{ fontSize: '12px', maxWidth: '240px', color: 'var(--text-secondary)', marginBottom: '6px', lineHeight: 1.3 }}>
             마이크나 악기 소리를 연주해 보세요.
           </p>
         </div>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
           {renderMicLevel()}
           <button
             onClick={onStopMonitoring}
             className="btn-danger"
             style={{
               width: '100%',
-              padding: '10px 24px',
-              fontSize: '14px',
+              padding: '8px 16px',
+              fontSize: '13px',
               fontWeight: 600,
               borderRadius: '8px',
-              height: '40px'
+              height: '36px'
             }}
           >
             분석 중지
@@ -159,10 +159,10 @@ export function KeyDisplay({
 
   // 3. Active key detected (shows real-time results or last-held results)
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '380px', width: '100%', padding: '4px 0', gap: '16px' }}>
-      <div style={{ textAlign: 'center', padding: '4px 0' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '290px', width: '100%', padding: '2px 0', gap: '8px' }}>
+      <div style={{ textAlign: 'center', padding: '2px 0' }}>
         <span style={{ 
-          fontSize: '10px', 
+          fontSize: '9px', 
           fontWeight: 700, 
           color: isMonitoring ? 'var(--primary)' : 'var(--text-muted)', 
           textTransform: 'uppercase', 
@@ -170,21 +170,28 @@ export function KeyDisplay({
         }}>
           {isMonitoring ? 'LIVE DETECTED KEY' : 'LAST DETECTED KEY (HOLD)'}
         </span>
-        <div className="key-hero" style={{ margin: '12px 0' }}>{keyName}</div>
+        <div style={{ 
+          fontSize: '32px', 
+          fontWeight: 800, 
+          color: 'var(--text-primary)', 
+          fontFamily: 'Outfit, var(--font-sans)', 
+          margin: '2px 0 4px', 
+          lineHeight: 1.1 
+        }}>{keyName}</div>
         
         {/* Confidence Progress Bar */}
-        <div style={{ maxWidth: '240px', margin: '0 auto 12px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', marginBottom: '4px', fontWeight: 500 }}>
+        <div style={{ maxWidth: '200px', margin: '0 auto 6px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', marginBottom: '2px', fontWeight: 500 }}>
             <span style={{ color: 'var(--text-secondary)' }}>신뢰도</span>
             <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{confidence}%</span>
           </div>
-          <div style={{ width: '100%', height: '4px', backgroundColor: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden' }}>
+          <div style={{ width: '100%', height: '3px', backgroundColor: 'var(--border-color)', borderRadius: '1.5px', overflow: 'hidden' }}>
             <div 
               style={{ 
                 width: `${confidence}%`, 
                 height: '100%', 
                 backgroundColor: 'var(--primary)',
-                borderRadius: '2px',
+                borderRadius: '1.5px',
                 transition: 'width 0.4s ease'
               }} 
             />
@@ -193,41 +200,41 @@ export function KeyDisplay({
       </div>
 
       {/* Key Relationship Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-        <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '8px 10px' }}>
-          <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>나란한 조 (Relative)</span>
-          <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--primary)', marginTop: '2px' }}>{relativeKey}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+        <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '6px 8px' }}>
+          <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 500 }}>나란한 조 (Relative)</span>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--primary)', marginTop: '1px' }}>{relativeKey}</div>
         </div>
-        <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '8px 10px' }}>
-          <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>같은으뜸음조 (Parallel)</span>
-          <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '2px' }}>{parallelKey}</div>
+        <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '6px 8px' }}>
+          <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 500 }}>같은으뜸음조 (Parallel)</span>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '1px' }}>{parallelKey}</div>
         </div>
-        <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '8px 10px' }}>
-          <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>버금딸림음 (IV)</span>
-          <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '2px' }}>{subdominant}</div>
+        <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '6px 8px' }}>
+          <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 500 }}>버금딸림음 (IV)</span>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '1px' }}>{subdominant}</div>
         </div>
-        <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '8px 10px' }}>
-          <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>딸림음 (V)</span>
-          <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '2px' }}>{dominant}</div>
+        <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '6px 8px' }}>
+          <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 500 }}>딸림음 (V)</span>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '1px' }}>{dominant}</div>
         </div>
       </div>
 
       {/* Alternative Candidates */}
       <div>
-        <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '6px' }}>
+        <span style={{ fontSize: '9px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '4px' }}>
           후보 키 (Candidates)
         </span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          {alternativeKeys.map((item, idx) => {
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+          {alternativeKeys.slice(0, 3).map((item, idx) => {
             const pct = Math.min(100, Math.max(0, Math.round((item.correlation - 0.2) * 166)));
             return (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', padding: '3px 6px', borderRadius: '4px' }}>
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', padding: '2px 4px', borderRadius: '4px' }}>
                 <span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}>{item.keyName}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '90px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', width: '80px' }}>
                   <div style={{ flexGrow: 1, height: '3px', backgroundColor: 'var(--border-color)', borderRadius: '1.5px', overflow: 'hidden' }}>
                     <div style={{ width: `${pct}%`, height: '100%', backgroundColor: 'var(--text-muted)' }} />
                   </div>
-                  <span style={{ fontSize: '10px', color: 'var(--text-muted)', minWidth: '20px', textAlign: 'right' }}>{pct}%</span>
+                  <span style={{ fontSize: '9px', color: 'var(--text-muted)', minWidth: '18px', textAlign: 'right' }}>{pct}%</span>
                 </div>
               </div>
             );
@@ -236,7 +243,7 @@ export function KeyDisplay({
       </div>
 
       {/* Mic Level and Action button inside panel */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto', width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: 'auto', width: '100%' }}>
         {renderMicLevel()}
         {isMonitoring ? (
           <button
@@ -244,11 +251,11 @@ export function KeyDisplay({
             className="btn-danger"
             style={{
               width: '100%',
-              padding: '10px 24px',
-              fontSize: '14px',
+              padding: '8px 16px',
+              fontSize: '13px',
               fontWeight: 600,
               borderRadius: '8px',
-              height: '40px'
+              height: '36px'
             }}
           >
             분석 중지
@@ -259,11 +266,11 @@ export function KeyDisplay({
             className="btn-primary"
             style={{
               width: '100%',
-              padding: '10px 24px',
-              fontSize: '14px',
+              padding: '8px 16px',
+              fontSize: '13px',
               fontWeight: 600,
               borderRadius: '8px',
-              height: '40px'
+              height: '36px'
             }}
           >
             새 분석 시작
