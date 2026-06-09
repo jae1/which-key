@@ -55,7 +55,7 @@ function App() {
           </div>
           <div>
             <h1 className="logo-text">WhichKey</h1>
-            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '-4px' }}>실시간 악기 키 & BPM 분석기</p>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginTop: '-3px' }}>악기 키 & BPM 분석</p>
           </div>
         </div>
         
@@ -98,10 +98,7 @@ function App() {
           
           {/* Main Visualizer and Control Panel */}
           <div className="panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 800, marginBottom: '4px' }}>오디오 주파수 분석 (Chroma Wheel)</h2>
-            <p style={{ fontSize: '13px', marginBottom: '12px', maxWidth: '320px' }}>
-              연주 소리의 음계를 실시간 주파수로 변환하여 12가지 음의 크기를 정밀 시각화합니다.
-            </p>
+            <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '12px' }}>크로마 휠 (Chroma Wheel)</h2>
 
             {/* Circular Canvas Visualizer */}
             <ChromaWheel 
@@ -112,18 +109,18 @@ function App() {
 
             {/* Input Audio Level Meter (Horizontal Bar) */}
             {isMonitoring && (
-              <div style={{ width: '100%', maxWidth: '300px', margin: '12px 0 20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                  <span>입력 레벨 (Mic Volume)</span>
+              <div style={{ width: '100%', maxWidth: '240px', margin: '8px 0 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                  <span>Mic Level</span>
                   <span>{inputLevel}%</span>
                 </div>
-                <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--border-color)', borderRadius: '4px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+                <div style={{ width: '100%', height: '4px', backgroundColor: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
                   <div 
                     style={{ 
                       width: `${inputLevel}%`, 
                       height: '100%', 
-                      background: 'linear-gradient(to right, var(--secondary), var(--primary))',
-                      borderRadius: '4px',
+                      background: 'var(--primary)',
+                      borderRadius: '2px',
                       transition: 'width 0.1s ease'
                     }} 
                   />
@@ -136,29 +133,28 @@ function App() {
               onClick={toggleMonitoring}
               className={isMonitoring ? 'btn-danger' : 'btn-primary'}
               style={{ 
-                padding: '14px 28px', 
-                fontSize: '16px', 
-                borderRadius: '12px',
+                padding: '10px 20px', 
+                fontSize: '14px', 
+                borderRadius: '8px',
                 width: '100%',
-                maxWidth: '300px',
-                boxShadow: isMonitoring ? 'none' : '0 4px 14px rgba(var(--primary-rgb), 0.3)'
+                maxWidth: '240px'
               }}
             >
               {isMonitoring ? (
                 <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="4" y="4" width="16" height="16" rx="2" />
                   </svg>
-                  분석 중지 (Stop Monitoring)
+                  분석 중지
                 </>
               ) : (
                 <>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
                     <line x1="12" y1="19" x2="12" y2="23"/>
                   </svg>
-                  분석 시작 (Start Monitoring)
+                  분석 시작
                 </>
               )}
             </button>
@@ -213,8 +209,8 @@ function App() {
           <a href="#privacy" onClick={(e) => { e.preventDefault(); setActiveModal('privacy'); }}>개인정보처리방침</a>
           <a href="#terms" onClick={(e) => { e.preventDefault(); setActiveModal('terms'); }}>이용약관</a>
         </div>
-        <p>&copy; {new Date().getFullYear()} WhichKey. All Rights Reserved. Designed for Worship Teams.</p>
-        <p style={{ fontSize: '11px', marginTop: '6px', opacity: 0.5 }}>본 서비스는 기기 마이크의 오디오 데이터를 외부 서버로 전송하지 않고 브라우저 내에서 안전하게 실시간으로 분석합니다.</p>
+        <p>&copy; {new Date().getFullYear()} WhichKey. All Rights Reserved.</p>
+        <p style={{ fontSize: '11px', marginTop: '6px', opacity: 0.4 }}>모든 오디오 데이터는 브라우저 내부에서 실시간 로컬 분석을 거치며 서버로 전송되지 않습니다. (100% On-Device)</p>
       </footer>
 
       {/* 5. Modals for Policy Compliance (Google AdSense Requirements) */}
