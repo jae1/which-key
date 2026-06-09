@@ -34,8 +34,75 @@ function getDiatonicChords(root: number, isMajor: boolean): { degree: string; ch
   });
 }
 
+interface ProgressionItem {
+  name: string;
+  degrees: string;
+  indices: number[];
+  description: string;
+}
+
+const MAJOR_PROGRESSIONS: ProgressionItem[] = [
+  {
+    name: '팝 머니 코드 (대중적인 팝송)',
+    degrees: 'I - V - vi - IV',
+    indices: [0, 4, 5, 3],
+    description: '전 세계 히트 팝송의 80% 이상에 사용된 가장 대중적이고 밝은 감성의 진행입니다.'
+  },
+  {
+    name: '4-5-3-6 진행 (서정적/J-Pop)',
+    degrees: 'IV - V - iii - vi',
+    indices: [3, 4, 2, 5],
+    description: '대중가요, J-Pop, 애니메이션 OST에서 극적인 감성과 아련함을 연출할 때 단골로 쓰입니다.'
+  },
+  {
+    name: '2-5-1 진행 (재즈/시티팝)',
+    degrees: 'ii - V - I',
+    indices: [1, 4, 0],
+    description: '재즈, R&B, 시티팝에서 곡의 긴장감을 예쁘게 해결하는 가장 중요한 기본 진행입니다.'
+  },
+  {
+    name: '캐논 진행 (클래식/가요)',
+    degrees: 'I - V - vi - iii - IV - I - IV - V',
+    indices: [0, 4, 5, 2, 3, 0, 3, 4],
+    description: '파헬벨의 캐논에서 유래했으며 서정적이고 흐름이 매우 매끄럽고 안정적입니다.'
+  },
+  {
+    name: '1-6-2-5 턴어라운드 (레트로/재즈)',
+    degrees: 'I - vi - ii - V',
+    indices: [0, 5, 1, 4],
+    description: '복고풍 발라드, 오래된 팝송, 혹은 재즈 곡 중간에 반복 연주 구간에서 단골로 쓰입니다.'
+  }
+];
+
+const MINOR_PROGRESSIONS: ProgressionItem[] = [
+  {
+    name: '마이너 머니 코드 (애절한 팝)',
+    degrees: 'i - VI - III - VII',
+    indices: [0, 5, 2, 6],
+    description: '어두우면서도 희망이 비치는 느낌을 주는 웅장하고 감정선이 깊은 대표 마이너 진행입니다.'
+  },
+  {
+    name: '마이너 2-5-1 진행 (재즈/R&B)',
+    degrees: 'ii° - v - i',
+    indices: [1, 4, 0],
+    description: '다크하고 성숙한 분위기를 만드는 진행으로, 마이너 재즈나 알앤비 곡에 필수적입니다.'
+  },
+  {
+    name: '안달루시아 진행 (라틴/스페니시)',
+    degrees: 'i - VII - VI - V',
+    indices: [0, 6, 5, 4],
+    description: '이국적이고 드라마틱한 스페인 풍 분위기를 연출할 때 매우 자주 쓰이는 진행입니다.'
+  },
+  {
+    name: '마이너 센티멘탈 진행',
+    degrees: 'i - iv - VII - III',
+    indices: [0, 3, 6, 2],
+    description: '센티멘탈하고 쓸쓸한 분위기를 풍기며, 발라드 곡의 벌스(Verse)에 잘 어울립니다.'
+  }
+];
+
 export function Transposition({ detectedKey }: TranspositionProps) {
-  const [activeTab, setActiveTab] = useState<'target' | 'matrix'>('target');
+  const [activeTab, setActiveTab] = useState<'target' | 'matrix' | 'progressions'>('target');
   const [targetKeyIndex, setTargetKeyIndex] = useState<number>(7); // Default to G (Index 7) for transpose example
   const [targetMode, setTargetMode] = useState<boolean>(true); // true = Major, false = Minor
 
@@ -123,6 +190,13 @@ export function Transposition({ detectedKey }: TranspositionProps) {
             style={{ padding: '3px 8px', fontSize: '11px', borderRadius: '4px' }}
           >
             12키 매트릭스
+          </button>
+          <button 
+            onClick={() => setActiveTab('progressions')}
+            className={`tab-btn ${activeTab === 'progressions' ? 'active' : ''}`}
+            style={{ padding: '3px 8px', fontSize: '11px', borderRadius: '4px' }}
+          >
+            추천 진행
           </button>
         </div>
       </div>
@@ -275,6 +349,67 @@ export function Transposition({ detectedKey }: TranspositionProps) {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* TAB 3: Suggested Chord Progressions */}
+        {activeTab === 'progressions' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '2px' }}>
+              * {sourceIsMajor ? 'Major' : 'Minor'} 키에서 감지/선택된 대표 코드 진행들입니다.
+            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '350px', overflowY: 'auto', paddingRight: '4px' }}>
+              {(sourceIsMajor ? MAJOR_PROGRESSIONS : MINOR_PROGRESSIONS).map((prog, idx) => {
+                const chordsList = prog.indices.map(i => sourceChords[i]?.chord || '');
+                return (
+                  <div 
+                    key={idx} 
+                    style={{ 
+                      background: 'rgba(128,128,128,0.01)', 
+                      border: '1px solid var(--border-color)', 
+                      borderRadius: '8px', 
+                      padding: '10px 12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>{prog.name}</span>
+                      <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--primary)', background: 'var(--primary-glow)', padding: '2px 6px', borderRadius: '4px' }}>
+                        {prog.degrees}
+                      </span>
+                    </div>
+                    
+                    {/* Chords Flow */}
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px', margin: '2px 0' }}>
+                      {chordsList.map((chord, cIdx) => (
+                        <div key={cIdx} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ 
+                            background: 'var(--bg-secondary, rgba(128,128,128,0.08))', 
+                            color: 'var(--primary)', 
+                            border: '1px solid var(--border-color)', 
+                            borderRadius: '6px', 
+                            padding: '3px 8px', 
+                            fontSize: '12px', 
+                            fontWeight: 700 
+                          }}>
+                            {chord}
+                          </span>
+                          {cIdx < chordsList.length - 1 && (
+                            <span style={{ color: 'var(--text-muted)', fontSize: '11px', userSelect: 'none' }}>→</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <p style={{ fontSize: '11px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.3 }}>
+                      {prog.description}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
