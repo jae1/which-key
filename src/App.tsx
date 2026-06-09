@@ -170,7 +170,7 @@ function App() {
     getAudioContext,
   } = useAudioEngine();
 
-  const [activeModal, setActiveModal] = useState<'privacy' | 'about' | 'terms' | null>(null);
+  const [isGuideCollapsed, setIsGuideCollapsed] = useState(true);
 
   // 2-tier layout layout v7 (chroma/key top, transposition/bpm/metronome bottom)
   const [layout, setLayout] = useState<{
@@ -308,7 +308,7 @@ function App() {
     }
   };
 
-  const handleCloseModal = () => setActiveModal(null);
+
 
   const renderWidget = (widget: Widget, rowKey: 'top' | 'bottom', index: number, totalInRow: number) => {
     const header = (
@@ -484,121 +484,135 @@ function App() {
         </div>
       </main>
 
+      {/* Guide Section - Text-rich content for AdSense SEO compliance */}
+      <section className="panel" style={{ marginTop: '24px', padding: '20px' }}>
+        <div 
+          onClick={() => setIsGuideCollapsed(!isGuideCollapsed)}
+          style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            cursor: 'pointer',
+            userSelect: 'none'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '18px' }}>📖</span>
+            <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
+              WhichKey 음악 분석 및 이론 가이드
+            </h2>
+          </div>
+          <button
+            style={{
+              width: '28px',
+              height: '28px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '14px',
+              background: 'var(--border-color)',
+              border: 'none',
+              color: 'var(--text-primary)',
+              borderRadius: '6px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            {isGuideCollapsed ? '+' : '−'}
+          </button>
+        </div>
+        
+        <div style={{ 
+          display: isGuideCollapsed ? 'none' : 'block',
+          marginTop: '20px', 
+          borderTop: '1px solid var(--border-color)',
+          paddingTop: '20px' 
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontSize: '14px', lineHeight: '1.7', color: 'var(--text-secondary)' }}>
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>1. WhichKey 서비스 개요 및 동작 원리</h3>
+              <p style={{ margin: 0 }}>
+                WhichKey는 브라우저를 통해 실시간으로 흘러나오는 소리를 분석하여 음악의 조성(Key)과 템포(BPM)를 감지하고, 연주자를 위한 조바꿈(Transposition) 정보와 다이아토닉 코드를 즉각적으로 제공하는 웹 서비스입니다. 이 서비스는 복잡한 하드웨어 설치나 서버 업로드 없이, HTML5 Web Audio API와 Fast Fourier Transform(고속 푸리에 변환) 기술을 활용하여 100% 클라이언트(On-Device) 내에서 오디오 신호를 처리합니다. 마이크를 통해 수집된 소리는 주파수 영역으로 실시간 변환된 뒤, 음악의 주요 화성적 특징인 크로마그램(Chromagram)으로 매핑됩니다.
+              </p>
+            </div>
+
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>2. 음악에서의 조성(Key)과 음계(Scale)</h3>
+              <p style={{ margin: 0, marginBottom: '10px' }}>
+                음악 이론에서 조성(Key)이란 곡의 중심이 되는 주음(으뜸음, Tonic)과 그 주음을 바탕으로 일정한 간격으로 배열된 음들의 집합인 음계(Scale) 사이의 관계를 의미합니다.
+              </p>
+              <ul style={{ paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <li><strong>장조 (Major Key)</strong>: 으뜸음으로부터 '온음-온음-반음-온음-온음-온음-반음'의 간격으로 구성된 7개의 음을 사용하며, 일반적으로 밝고 경쾌하며 안정적인 느낌을 줍니다.</li>
+                <li><strong>단조 (Minor Key)</strong>: 으뜸음으로부터 '온음-반음-온음-온음-반음-온음-온음' (자연단음계 기준)의 간격으로 음이 배치되며, 다소 어둡고 슬프거나 진지한 감정을 자아냅니다.</li>
+              </ul>
+              <p style={{ margin: 0, marginTop: '10px' }}>
+                곡의 조성을 명확히 아는 것은 연주나 편곡 시 매우 중요합니다. 올바른 스케일 상의 음들을 활용하여 멜로디를 구성하고, 코드 진행을 자연스럽게 전개하거나 원하는 음역대에 맞춰 키를 이조(Transposition)할 수 있기 때문입니다.
+              </p>
+            </div>
+
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>3. 실시간 크로마 휠(Chroma Wheel) 분석 기법</h3>
+              <p style={{ margin: 0, marginBottom: '10px' }}>
+                크로마 휠은 인간이 느끼는 12가지 반음(C, C#, D, D#, E, F, F#, G, G#, A, A#, B)의 옥타브 독립적 에너지 분포를 동심원 상에 실시간으로 시각화한 분석 패널입니다.
+              </p>
+              <ul style={{ paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <li><strong>주파수 분석(FFT)</strong>: 수집된 오디오 신호는 이산 푸리에 변환 알고리즘을 거쳐 주파수 영역의 스펙트럼 데이터로 수치화됩니다.</li>
+                <li><strong>크로마 벡터 매핑</strong>: 계산된 각 주파수 세기는 피치 클래스(Pitch Class)별로 정렬됩니다. 이 과정을 거치며 옥타브가 다른 동일 음역대(예: C3, C4, C5)의 에너지는 하나의 'C' 크로마 성분으로 합산됩니다.</li>
+                <li><strong>시각 피드백</strong>: 실시간 크로마 휠을 관찰함으로써 곡의 조성을 형성하는 화음 구성음들과 지배적인 선율 피치를 한눈에 확인할 수 있습니다.</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>4. Krumhansl-Schmuckler 조성 분석 알고리즘</h3>
+              <p style={{ margin: 0 }}>
+                입력된 크로마 데이터를 기반으로 실제 음악의 키를 예측할 때 인지 음악학 분야에서 공인된 Krumhansl-Schmuckler 조성 프로필 상관분석 모델이 적용됩니다. 각 24개 장/단조는 역사적/인지적 중요도에 따른 고유의 키 프로필(Key Profile) 분포도를 가지고 있습니다. 서비스는 실시간 축적되는 입력 크로마 성분과 24개 키 프로필 분포 간의 피어슨 상관계수(Pearson Correlation Coefficient)를 실시간으로 계산하여 가장 매칭도가 높은 조성을 기본 키(Primary Key)로 선출하며, 유사한 다른 후보군들을 대체 키(Alternative Keys)로 제시하여 잡음 및 배음으로 인한 오동작 확률을 현저히 낮춥니다.
+              </p>
+            </div>
+
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>5. 다이아토닉 코드(Diatonic Chords)와 화성적 기능</h3>
+              <p style={{ margin: 0, marginBottom: '10px' }}>
+                특정 조성이 정해지면 해당 스케일의 음만으로 순차적으로 쌓아 올린 7개의 다이아토닉 코드(Diatonic Chords)가 정의됩니다. 각 화음은 곡의 전개 과정에서 아래와 같은 고유한 화성적 역할을 수행합니다.
+              </p>
+              <ul style={{ paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <li><strong>I도 (Tonic, 으뜸화음)</strong>: 조성의 출발점이자 최종 도착점 역할을 하는 가장 안정적인 화음입니다.</li>
+                <li><strong>IV도 (Subdominant, 버금딸림화음)</strong>: 조성에 풍부한 진행감을 더하며, 으뜸화음에서 딸림화음으로 전개할 때 매끄러운 징검다리 다리 역할을 수행합니다.</li>
+                <li><strong>V도 (Dominant, 딸림화음)</strong>: 강한 긴장감을 내포하고 있으며, 자연스럽게 안정적인 으뜸화음(I도)으로 해결하려는 강력한 성질(진행력)을 가집니다.</li>
+              </ul>
+              <p style={{ margin: 0, marginTop: '10px' }}>
+                WhichKey가 매핑해주는 다이아토닉 코드 표를 참고하면 복잡한 악보가 없는 즉석 잼 연주, 찬양팀 인도 시 유연한 연주 조율, 작곡 및 편곡 작업을 직관적으로 수월하게 이끌어갈 수 있습니다.
+              </p>
+            </div>
+
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>6. 조바꿈(Transposition) 및 이조 연주 팁</h3>
+              <p style={{ margin: 0 }}>
+                가창자의 음역 대역이나 사용하는 악기 종류에 맞추어 연주 키를 바꿀 때 조바꿈 패널을 유용하게 쓸 수 있습니다. 반음(Semitone) 단위의 정밀한 이조 계산 기능을 탑재하여 현재 감지된 오리지널 키와 이조할 타겟 키 간의 세부 간격을 즉각 계산해 주며, 특히 어쿠스틱 기타리스트를 위한 카포(Capo) 프렛 매핑 정보와 이조악기(Bb, Eb) 연주자들을 위한 실음 환산 정보를 지원하여 리허설 현장에서 신속한 협업을 이끌어 냅니다.
+              </p>
+            </div>
+
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>7. 템포(BPM) 측정 및 메트로놈 활용법</h3>
+              <p style={{ margin: 0 }}>
+                BPM(Beats Per Minute)은 음악의 템포(속도)를 나타내는 국제적 정량 단위로, 1분당 박자 반복 횟수를 의미합니다. WhichKey는 드럼 타악 비트의 실시간 트랜지언트(Transient) 에너지를 포착하여 곡의 대략적인 속도를 자동 산출하는 자동 감지 모드와 연주를 들으며 탭 동작을 취해 측정하는 탭 템포(Tap Tempo) 모드를 지원합니다. 이렇게 측정 및 입력된 BPM 정보는 고정밀 웹 오디오 기반의 클릭 사운드 메트로놈과 즉각 동기화되어, 사용자가 완벽한 템포 감각으로 박자 흔들림 없는 개인 악기 연습 및 밴드 지휘를 영위하도록 지원합니다.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <AdSlot type="horizontal" />
 
       {/* Footer & AdSense Compliance Policies */}
       <footer className="app-footer">
         <div className="footer-links">
-          <a href="#about" onClick={(e) => { e.preventDefault(); setActiveModal('about'); }}>서비스 소개</a>
-          <a href="#privacy" onClick={(e) => { e.preventDefault(); setActiveModal('privacy'); }}>개인정보처리방침</a>
-          <a href="#terms" onClick={(e) => { e.preventDefault(); setActiveModal('terms'); }}>이용약관</a>
+          <a href="/about.html" target="_blank" rel="noopener noreferrer">서비스 소개</a>
+          <a href="/privacy.html" target="_blank" rel="noopener noreferrer">개인정보처리방침</a>
+          <a href="/terms.html" target="_blank" rel="noopener noreferrer">이용약관</a>
         </div>
         <p>&copy; {new Date().getFullYear()} WhichKey. All Rights Reserved.</p>
         <p style={{ fontSize: '11px', marginTop: '6px', opacity: 0.4 }}>모든 오디오 데이터는 브라우저 내부에서 실시간 로컬 분석을 거치며 서버로 전송되지 않습니다. (100% On-Device)</p>
       </footer>
-
-      {/* Modals for Policy Compliance (Google AdSense Requirements) */}
-      {activeModal && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.65)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '16px'
-        }} onClick={handleCloseModal}>
-          <div style={{
-            background: document.documentElement.getAttribute('data-theme') === 'light' ? '#ffffff' : '#121424',
-            border: '1px solid var(--panel-border)',
-            borderRadius: '16px',
-            boxShadow: 'var(--panel-shadow)',
-            padding: '24px',
-            maxWidth: '600px',
-            width: '100%',
-            maxHeight: '80vh',
-            overflowY: 'auto',
-            position: 'relative'
-          }} onClick={(e) => e.stopPropagation()}>
-            <button 
-              onClick={handleCloseModal}
-              style={{
-                position: 'absolute',
-                top: '16px',
-                right: '16px',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-secondary)',
-                fontSize: '20px',
-                cursor: 'pointer',
-                padding: '4px'
-              }}
-            >
-              &times;
-            </button>
-
-            {/* About Modal */}
-            {activeModal === 'about' && (
-              <div>
-                <h2 style={{ fontSize: '22px', marginBottom: '16px', color: 'var(--primary)' }}>WhichKey 서비스 소개</h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px', lineHeight: '1.6' }}>
-                  <p><strong>WhichKey</strong>는 찬양팀 인도자와 연주자들(특히 베이스 기타리스트 및 세컨 건반 반주자)을 위해 설계된 실시간 음악 키(Key) 및 BPM 측정 도구입니다.</p>
-                  <p>절대음감이 없어도 실시간으로 연주되는 음악이나 마이크 입력 소리만으로 즉시 조표(Key)를 파악할 수 있으며, 이에 해당하는 주요 관계조(나란한 조, 같은 으뜸음 조, 딸림음, 버금딸림음) 및 다이아토닉 코드를 12키 전체 일람표나 변환 탭을 통해 즉각 매핑하여 드립니다.</p>
-                  <p><strong>주요 특징:</strong></p>
-                  <ul>
-                    <li><strong>로컬 프라이버시</strong>: 모든 오디오 프로세싱은 브라우저(Client-side)의 Web Audio API만을 사용합니다. 오디오 스트림이나 녹음 파일이 외부 서버로 업로드되지 않으므로 데이터와 프라이버시가 안전하게 보장됩니다.</li>
-                    <li><strong>정밀한 크로마그램 알고리즘</strong>: Krumhansl-Schmuckler 화성 분석 상관분석을 사용하여 코드나 곡의 조성(Key)을 실시간으로 추정합니다.</li>
-                    <li><strong>탭 템포 및 메트로놈 내장</strong>: 실시간 드럼 비트 감지 기술과 수동 탭 템포 기능을 결합하여 정확한 박자 연습을 돕습니다.</li>
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            {/* Privacy Policy Modal */}
-            {activeModal === 'privacy' && (
-              <div>
-                <h2 style={{ fontSize: '22px', marginBottom: '16px', color: 'var(--primary)' }}>개인정보처리방침 (Privacy Policy)</h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
-                  <p>본 개인정보처리방침은 WhichKey(이하 '서비스')가 제공하는 웹 애플리케이션의 오디오 데이터 이용 및 개인정보 취급 정책을 설명합니다.</p>
-                  <p><strong>1. 오디오 데이터 수집 및 처리 거부</strong><br />
-                  본 서비스는 실시간 음악 키 및 BPM 측정을 위하여 사용자 기기의 마이크(Audio Input) 권한을 요청합니다. 권한 수락 시 사용되는 오디오 데이터는 브라우저 내부(사용자 기기 메모리)에서만 실시간으로 신호 분석(FFT 연산 등)을 수행한 뒤 즉시 파기됩니다. 서버로 전송, 영구 저장, 또는 제3자에게 전송되지 않습니다.</p>
-                  <p><strong>2. 쿠키 및 광고 제공에 대한 사항 (구글 애드센스)</strong><br />
-                  본 서비스는 서비스 유지 관리를 위한 광고 게재를 위해 Google AdSense를 이용할 수 있습니다. 구글을 포함한 제3자 제공업체는 사용자가 웹사이트를 방문한 방문 기록을 토대로 맞춤형 광고를 제공하기 위해 쿠키(Cookies)를 사용합니다. 맞춤설정 광고 게재가 원치 않으실 경우, 사용자는 구글의 <a href="https://adssettings.google.com" target="_blank" rel="noreferrer">광고 설정 페이지</a>에서 맞춤설정 광고를 사용 중지할 수 있습니다.</p>
-                  <p><strong>3. 통계 분석 도구</strong><br />
-                  서비스 품질 개선 및 트래픽 분석을 위해 익명의 트래픽 통계 도구(예: Google Analytics)를 이용할 수 있으며, 수집되는 정보는 비개인적 통계 정보에 한정됩니다.</p>
-                  <p><strong>문의 사항:</strong> 기타 문의사항은 도메인 웹마스터 메일을 통해 전달해 주시기 바랍니다.</p>
-                </div>
-              </div>
-            )}
-
-            {/* Terms of Service Modal */}
-            {activeModal === 'terms' && (
-              <div>
-                <h2 style={{ fontSize: '22px', marginBottom: '16px', color: 'var(--primary)' }}>이용약관 (Terms of Service)</h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
-                  <p><strong>제 1 조 (목적)</strong><br />
-                  본 약관은 WhichKey가 제공하는 음악 보조 유틸리티 웹서비스의 이용 조건 및 절차를 규정함을 목적으로 합니다.</p>
-                  <p><strong>제 2 조 (서비스 이용 및 제한)</strong><br />
-                  1. 서비스는 비로그인 상태에서 무료로 이용할 수 있으며, 마이크 권한 동의를 전제로 작동합니다.<br />
-                  2. 본 서비스에서 분석되어 나타나는 음악의 Key 및 BPM 정보는 디지털 신호 알고리즘에 기반한 추정치로, 환경적 잡음 또는 배음 구조에 의해 100%의 정확성을 보장하지 않습니다. 연주 결과물에 대한 최종 판단은 연주자 본인에게 있습니다.</p>
-                  <p><strong>제 3 조 (책임의 한계 및 면책)</strong><br />
-                  서비스 제공자는 웹사이트 이용과 관련하여 발생할 수 있는 직접적, 간접적 데이터 손실 또는 브라우저 작동 문제에 대해 관련 법령에 특별한 규정이 없는 한 책임을 지지 않습니다.</p>
-                </div>
-              </div>
-            )}
-
-            <button 
-              onClick={handleCloseModal}
-              className="btn-primary"
-              style={{ width: '100%', marginTop: '20px', padding: '10px' }}
-            >
-              닫기
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

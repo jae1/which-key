@@ -5,7 +5,11 @@ interface AdSlotProps {
 }
 
 export function AdSlot({ type }: AdSlotProps) {
+  const adClient = "ca-pub-XXXXXXXXXXXXXXXX"; // User should replace this with real publisher ID
+  const isPlaceholder = adClient.includes("XXXXXX");
+
   useEffect(() => {
+    if (isPlaceholder) return;
     try {
       if (typeof window !== 'undefined' && (window as any).adsbygoogle) {
         ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
@@ -13,7 +17,11 @@ export function AdSlot({ type }: AdSlotProps) {
     } catch (err) {
       // Quietly ignore in development
     }
-  }, []);
+  }, [isPlaceholder]);
+
+  if (isPlaceholder) {
+    return null; // Keep layout completely clean and prevent console errors during AdSense review
+  }
 
   const style = type === 'horizontal' 
     ? { minHeight: '90px', width: '100%', display: 'flex', justifyContent: 'center', margin: '8px 0' }
@@ -21,14 +29,9 @@ export function AdSlot({ type }: AdSlotProps) {
 
   return (
     <div style={style}>
-      {/* 
-        Google AdSense Unit:
-        Below is the placeholder where AdSense will inject the actual advertisement.
-        No artificial borders or placeholders are shown in production to keep the design clean.
-      */}
       <ins className="adsbygoogle"
            style={{ display: 'block', width: '100%', height: '100%' }}
-           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" // Replace with real Publisher ID
+           data-ad-client={adClient}
            data-ad-slot="XXXXXXXXXX"               // Replace with real Slot ID
            data-ad-format="auto"
            data-full-width-responsive="true"></ins>

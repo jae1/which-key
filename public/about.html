@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서비스 소개 - WhichKey</title>
+  <style>
+    :root {
+      --bg: #0b0b0e;
+      --text: #e1e1e6;
+      --text-secondary: #a1a1aa;
+      --primary: #6366f1;
+      --border: #27272a;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      line-height: 1.7;
+    }
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    p, li {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .footer {
+      margin-top: 48px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>WhichKey 서비스 소개 (About Us)</h1>
+    
+    <p>WhichKey는 음악가, 프로듀서, 악기 연습생들을 위한 웹 기반 스마트 오디오 분석 도구 모음입니다. 마이크를 통해 흘러 들어오는 악기나 음원 소리를 분석하여 유용한 정보를 실시간으로 추출하고 표시합니다.</p>
+    
+    <h2>주요 제공 기능</h2>
+    <ul>
+      <li><strong>실시간 음악 조(Key) 판별</strong>: 현재 연주되거나 스피커로 재생되는 곡이 어떤 조(Key, 예: C Major, G Minor 등)인지 빠르게 예측하고, 어울리는 나란한 조, 같은으뜸음조 등의 화성 이론 정보를 한눈에 보여줍니다.</li>
+      <li><strong>실시간 BPM 트래킹 & 탭 템포</strong>: 재생되는 음악의 드럼/비트 리듬을 분석하여 실시간 템포(BPM)를 자동으로 감지하며, 직접 탭하여 템포를 셀 수 있는 Tap Tempo 기능도 함께 제공합니다.</li>
+      <li><strong>다기능 메트로놈</strong>: 수동/감지 템포와 연동되며, 분자/분모 박자표 조절 및 위아래 탭 인터페이스를 활용한 직관적인 박자 컨트롤이 가능합니다.</li>
+      <li><strong>12키 코드 매트릭스 & 조옮김</strong>: 감지된 원곡의 키를 다른 키로 쉽게 조옮김(Transposition)했을 때 생성되는 코드 조합을 즉시 확인할 수 있습니다.</li>
+    </ul>
+    
+    <h2>기술적 강점</h2>
+    <p>본 서비스는 별도의 서버 업로드나 백엔드 통신 없이, 최신 웹 브라우저의 <strong>Web Audio API</strong>와 실시간 <strong>고속 푸리에 변환(FFT)</strong>을 이용해 브라우저 내부 메모리상에서 순수 자바스크립트로 연산됩니다. 따라서 데이터 소모가 없으며 개인 정보 보호가 확실합니다.</p>
+    
+    <div class="footer">
+      &copy; 2026 WhichKey. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
