@@ -691,9 +691,9 @@ function App() {
       {/* Footer & AdSense Compliance Policies */}
       <footer className="app-footer">
         <div className="footer-links">
-          <a href="#about" onClick={(e) => { e.preventDefault(); setView('about'); window.scrollTo(0, 0); }}>About</a>
-          <a href="#privacy" onClick={(e) => { e.preventDefault(); setView('privacy'); window.scrollTo(0, 0); }}>Privacy Policy</a>
-          <a href="#terms" onClick={(e) => { e.preventDefault(); setView('terms'); window.scrollTo(0, 0); }}>Terms of Service</a>
+          <a href="/about.html" onClick={(e) => { e.preventDefault(); setView('about'); window.scrollTo(0, 0); }}>About</a>
+          <a href="/privacy.html" onClick={(e) => { e.preventDefault(); setView('privacy'); window.scrollTo(0, 0); }}>Privacy Policy</a>
+          <a href="/terms.html" onClick={(e) => { e.preventDefault(); setView('terms'); window.scrollTo(0, 0); }}>Terms of Service</a>
         </div>
         <p>&copy; {new Date().getFullYear()} WhichKey. All Rights Reserved.</p>
         <p style={{ fontSize: '11px', marginTop: '6px', opacity: 0.4 }}>All audio data is analyzed locally in real-time inside your browser and is never sent to a server (100% On-Device).</p>
