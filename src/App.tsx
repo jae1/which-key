@@ -64,9 +64,6 @@ function App() {
         </div>
       </header>
 
-      {/* Top Banner AdSlot */}
-      <AdSlot type="horizontal" />
-
       {/* 2. Error Message Area */}
       {errorMsg && (
         <div style={{ 
@@ -93,7 +90,7 @@ function App() {
       {/* 3. Main Dashboard Grid */}
       <main className="app-grid">
         
-        {/* Column 1: 오디오 분석 (Chroma Wheel) */}
+        {/* Column 1: 오디오 감지 및 BPM */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div className="panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '12px' }}>크로마 휠 (Chroma Wheel)</h2>
@@ -151,21 +148,7 @@ function App() {
               )}
             </button>
           </div>
-        </div>
 
-        {/* Column 2: 음악 키 분석 및 조바꿈 계산기 */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <KeyDisplay 
-            detectedKey={detectedKey}
-            confidence={confidence}
-            alternativeKeys={alternativeKeys}
-            isMonitoring={isMonitoring}
-          />
-          <Transposition detectedKey={detectedKey} />
-        </div>
-
-        {/* Column 3: 템포, 메트로놈, 광고 */}
-        <div className="grid-col-3" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <BpmDisplay 
             bpm={bpm}
             isBeat={isBeat}
@@ -174,10 +157,25 @@ function App() {
             resetBpm={resetBpm}
             isMonitoring={isMonitoring}
           />
+        </div>
+
+        {/* Column 2: 감지된 키 및 메트로놈 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <KeyDisplay 
+            detectedKey={detectedKey}
+            confidence={confidence}
+            alternativeKeys={alternativeKeys}
+            isMonitoring={isMonitoring}
+          />
           <Metronome 
             currentBpm={manualBpm > 0 ? manualBpm : (bpm || 120)}
             getAudioContext={getAudioContext}
           />
+        </div>
+
+        {/* Column 3: 조바꿈 계산기 & 광고 */}
+        <div className="grid-col-3" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <Transposition detectedKey={detectedKey} />
           <AdSlot type="sidebar" />
         </div>
       </main>

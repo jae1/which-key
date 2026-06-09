@@ -177,15 +177,16 @@ export function ChromaWheel({ chromagram, inputLevel, isMonitoring }: ChromaWhee
   }, []);
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', padding: '10px 0' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', padding: '4px 0' }}>
       <canvas
         ref={canvasRef}
-        width={340}
-        height={340}
+        width={280}
+        height={280}
         style={{
-          width: '340px',
-          height: '340px',
-          maxWidth: '100%',
+          width: '100%',
+          maxWidth: '280px',
+          height: 'auto',
+          aspectRatio: '1 / 1',
         }}
       />
     </div>

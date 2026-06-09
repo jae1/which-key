@@ -86,7 +86,7 @@ export function useAudioEngine() {
       sumSquares += normalized * normalized;
     }
     const rms = Math.sqrt(sumSquares / bufferLength);
-    const level = Math.min(100, Math.round(rms * 400)); // Amplify scale for mic visibility
+    const level = Math.min(100, Math.round(Math.sqrt(rms) * 140)); // High-sensitivity square root scaling
     setInputLevel(level);
 
     // Only process key and bpm if there is some sound input (threshold check)
