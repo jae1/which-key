@@ -98,7 +98,7 @@ function WidgetHeader({
               cursor: 'pointer',
               borderRadius: '4px'
             }}
-            title="왼쪽으로 이동"
+            title="Move Left"
           >
             ←
           </button>
@@ -119,7 +119,7 @@ function WidgetHeader({
               cursor: 'pointer',
               borderRadius: '4px'
             }}
-            title="오른쪽으로 이동"
+            title="Move Right"
           >
             →
           </button>
@@ -143,7 +143,7 @@ function WidgetHeader({
             cursor: 'pointer',
             transition: 'background-color 0.15s ease'
           }}
-          title={widget.isCollapsed ? '펼치기' : '접기'}
+          title={widget.isCollapsed ? 'Expand' : 'Collapse'}
         >
           {widget.isCollapsed ? '+' : '−'}
         </button>
@@ -172,12 +172,12 @@ function App() {
 
   const [isGuideCollapsed, setIsGuideCollapsed] = useState(true);
 
-  // 2-tier layout layout v7 (chroma/key top, transposition/bpm/metronome bottom)
+  // 2-tier layout layout v9 (chroma/key top, transposition/bpm/metronome bottom)
   const [layout, setLayout] = useState<{
     top: Widget[];
     bottom: Widget[];
   }>(() => {
-    const saved = localStorage.getItem('dashboard_layout_v8');
+    const saved = localStorage.getItem('dashboard_layout_v9');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -185,19 +185,19 @@ function App() {
     }
     return {
       top: [
-        { id: 'key', title: '감지된 키 (Key)', isCollapsed: false },
-        { id: 'chroma', title: '크로마 휠 (Chroma Wheel)', isCollapsed: false }
+        { id: 'key', title: 'Detected Key', isCollapsed: false },
+        { id: 'chroma', title: 'Chroma Wheel', isCollapsed: false }
       ],
       bottom: [
-        { id: 'transposition', title: '조바꿈 (Transpose)', isCollapsed: false },
-        { id: 'bpm', title: '템포 (BPM)', isCollapsed: false },
-        { id: 'metronome', title: '메트로놈', isCollapsed: false }
+        { id: 'transposition', title: 'Transposition', isCollapsed: false },
+        { id: 'bpm', title: 'Tempo (BPM)', isCollapsed: false },
+        { id: 'metronome', title: 'Metronome', isCollapsed: false }
       ]
     };
   });
 
   useEffect(() => {
-    localStorage.setItem('dashboard_layout_v8', JSON.stringify(layout));
+    localStorage.setItem('dashboard_layout_v9', JSON.stringify(layout));
   }, [layout]);
 
   const [draggedWidgetId, setDraggedWidgetId] = useState<string | null>(null);
@@ -287,17 +287,17 @@ function App() {
   const handleResetLayout = () => {
     const defaultLayout = {
       top: [
-        { id: 'key', title: '감지된 키 (Key)', isCollapsed: false },
-        { id: 'chroma', title: '크로마 휠 (Chroma Wheel)', isCollapsed: false }
+        { id: 'key', title: 'Detected Key', isCollapsed: false },
+        { id: 'chroma', title: 'Chroma Wheel', isCollapsed: false }
       ],
       bottom: [
-        { id: 'transposition', title: '조바꿈 (Transpose)', isCollapsed: false },
-        { id: 'bpm', title: '템포 (BPM)', isCollapsed: false },
-        { id: 'metronome', title: '메트로놈', isCollapsed: false }
+        { id: 'transposition', title: 'Transposition', isCollapsed: false },
+        { id: 'bpm', title: 'Tempo (BPM)', isCollapsed: false },
+        { id: 'metronome', title: 'Metronome', isCollapsed: false }
       ]
     };
     setLayout(defaultLayout);
-    localStorage.removeItem('dashboard_layout_v8');
+    localStorage.removeItem('dashboard_layout_v9');
   };
 
   const toggleMonitoring = () => {
@@ -423,7 +423,7 @@ function App() {
           </div>
           <div>
             <h1 className="logo-text">WhichKey</h1>
-            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginTop: '-3px' }}>악기 키 & BPM 분석</p>
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginTop: '-3px' }}>Instrument Key & BPM Analyzer</p>
           </div>
         </div>
         
@@ -444,7 +444,7 @@ function App() {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '2px' }}>
                   <rect x="4" y="4" width="16" height="16" rx="2" />
                 </svg>
-                분석 중지
+                Stop Analysis
               </>
             ) : (
               <>
@@ -454,19 +454,19 @@ function App() {
                   <line x1="12" y1="19" x2="12" y2="23"/>
                   <line x1="8" y1="23" x2="16" y2="23"/>
                 </svg>
-                분석 시작
+                Start Analysis
               </>
             )}
           </button>
 
-          <button onClick={handleResetLayout} className="btn-reset-layout" title="모든 패널 크기와 위치를 기본값으로 되돌립니다.">
+          <button onClick={handleResetLayout} className="btn-reset-layout" title="Reset all panels to default sizes and positions">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
               <path d="M16 3h5v5" />
               <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
               <path d="M8 21H3v-5" />
             </svg>
-            <span className="btn-text">레이아웃 초기화</span>
+            <span className="btn-text">Reset Layout</span>
           </button>
           <ThemeToggle />
         </div>
@@ -499,7 +499,7 @@ function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '18px' }}>📖</span>
             <h2 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
-              WhichKey 음악 분석 및 이론 가이드
+              WhichKey Music Analysis & Theory Guide
             </h2>
           </div>
           <button
@@ -530,71 +530,71 @@ function App() {
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', fontSize: '14px', lineHeight: '1.7', color: 'var(--text-secondary)' }}>
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>1. WhichKey 서비스 개요 및 동작 원리</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>1. WhichKey Overview & How It Works</h3>
               <p style={{ margin: 0 }}>
-                WhichKey는 브라우저를 통해 실시간으로 흘러나오는 소리를 분석하여 음악의 조성(Key)과 템포(BPM)를 감지하고, 연주자를 위한 조바꿈(Transposition) 정보와 다이아토닉 코드를 즉각적으로 제공하는 웹 서비스입니다. 이 서비스는 복잡한 하드웨어 설치나 서버 업로드 없이, HTML5 Web Audio API와 Fast Fourier Transform(고속 푸리에 변환) 기술을 활용하여 100% 클라이언트(On-Device) 내에서 오디오 신호를 처리합니다. 마이크를 통해 수집된 소리는 주파수 영역으로 실시간 변환된 뒤, 음악의 주요 화성적 특징인 크로마그램(Chromagram)으로 매핑됩니다.
+                WhichKey is a web service that analyzes real-time audio from your browser to detect the musical key and tempo (BPM), providing musicians with instant transposition guides and diatonic chord matrixes. Without complex hardware setups or server uploads, it leverages the HTML5 Web Audio API and Fast Fourier Transform (FFT) to process audio signals 100% on the client side (On-Device). Audio captured via the microphone is converted to the frequency domain in real-time, then mapped to a Chromagram—a representation of the twelve semitone pitch classes.
               </p>
             </div>
 
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>2. 음악에서의 조성(Key)과 음계(Scale)</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>2. Musical Keys and Scales</h3>
               <p style={{ margin: 0, marginBottom: '10px' }}>
-                음악 이론에서 조성(Key)이란 곡의 중심이 되는 주음(으뜸음, Tonic)과 그 주음을 바탕으로 일정한 간격으로 배열된 음들의 집합인 음계(Scale) 사이의 관계를 의미합니다.
+                In music theory, a key defines the relationship between the tonic (the home pitch or center of gravity of a piece) and the scale (a set of pitches ordered by specific intervals built upon the tonic).
               </p>
               <ul style={{ paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <li><strong>장조 (Major Key)</strong>: 으뜸음으로부터 '온음-온음-반음-온음-온음-온음-반음'의 간격으로 구성된 7개의 음을 사용하며, 일반적으로 밝고 경쾌하며 안정적인 느낌을 줍니다.</li>
-                <li><strong>단조 (Minor Key)</strong>: 으뜸음으로부터 '온음-반음-온음-온음-반음-온음-온음' (자연단음계 기준)의 간격으로 음이 배치되며, 다소 어둡고 슬프거나 진지한 감정을 자아냅니다.</li>
+                <li><strong>Major Key</strong>: Built using the interval pattern "W-W-H-W-W-W-H" (whole and half steps) starting from the tonic. It generally evokes a bright, cheerful, and stable character.</li>
+                <li><strong>Minor Key</strong>: Built using the interval pattern "W-H-W-W-H-W-W" (natural minor) from the tonic. It generally projects a dark, melancholic, or serious mood.</li>
               </ul>
               <p style={{ margin: 0, marginTop: '10px' }}>
-                곡의 조성을 명확히 아는 것은 연주나 편곡 시 매우 중요합니다. 올바른 스케일 상의 음들을 활용하여 멜로디를 구성하고, 코드 진행을 자연스럽게 전개하거나 원하는 음역대에 맞춰 키를 이조(Transposition)할 수 있기 때문입니다.
+                Knowing the key is essential for performing and arranging. It lets musicians construct melodies within the correct scale, develop harmonic progressions naturally, and transpose chords to match any vocal or instrumental range.
               </p>
             </div>
 
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>3. 실시간 크로마 휠(Chroma Wheel) 분석 기법</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>3. Real-time Chromagram Analysis</h3>
               <p style={{ margin: 0, marginBottom: '10px' }}>
-                크로마 휠은 인간이 느끼는 12가지 반음(C, C#, D, D#, E, F, F#, G, G#, A, A#, B)의 옥타브 독립적 에너지 분포를 동심원 상에 실시간으로 시각화한 분석 패널입니다.
+                The Chroma Wheel is an analysis panel that visualizes the octave-independent energy distribution of the 12 chromatic semitones (C, C#, D, D#, E, F, F#, G, G#, A, A#, B) on a circular layout in real-time.
               </p>
               <ul style={{ paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <li><strong>주파수 분석(FFT)</strong>: 수집된 오디오 신호는 이산 푸리에 변환 알고리즘을 거쳐 주파수 영역의 스펙트럼 데이터로 수치화됩니다.</li>
-                <li><strong>크로마 벡터 매핑</strong>: 계산된 각 주파수 세기는 피치 클래스(Pitch Class)별로 정렬됩니다. 이 과정을 거치며 옥타브가 다른 동일 음역대(예: C3, C4, C5)의 에너지는 하나의 'C' 크로마 성분으로 합산됩니다.</li>
-                <li><strong>시각 피드백</strong>: 실시간 크로마 휠을 관찰함으로써 곡의 조성을 형성하는 화음 구성음들과 지배적인 선율 피치를 한눈에 확인할 수 있습니다.</li>
+                <li><strong>Frequency Analysis (FFT)</strong>: The incoming audio stream is processed via Discrete Fourier Transform algorithms to generate frequency-domain spectral data.</li>
+                <li><strong>Chroma Vector Mapping</strong>: The computed frequency magnitudes are grouped into pitch classes. This means energies from different octaves (e.g., C3, C4, C5) are folded into a single 'C' chroma bin.</li>
+                <li><strong>Visual Feedback</strong>: By observing the live Chroma Wheel, you can instantly see which notes make up the sounding chords and identify the dominant pitches shaping the melody.</li>
               </ul>
             </div>
 
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>4. Krumhansl-Schmuckler 조성 분석 알고리즘</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>4. Krumhansl-Schmuckler Key Finding Algorithm</h3>
               <p style={{ margin: 0 }}>
-                입력된 크로마 데이터를 기반으로 실제 음악의 키를 예측할 때 인지 음악학 분야에서 공인된 Krumhansl-Schmuckler 조성 프로필 상관분석 모델이 적용됩니다. 각 24개 장/단조는 역사적/인지적 중요도에 따른 고유의 키 프로필(Key Profile) 분포도를 가지고 있습니다. 서비스는 실시간 축적되는 입력 크로마 성분과 24개 키 프로필 분포 간의 피어슨 상관계수(Pearson Correlation Coefficient)를 실시간으로 계산하여 가장 매칭도가 높은 조성을 기본 키(Primary Key)로 선출하며, 유사한 다른 후보군들을 대체 키(Alternative Keys)로 제시하여 잡음 및 배음으로 인한 오동작 확률을 현저히 낮춥니다.
+                To predict the key from chroma data, WhichKey uses the Krumhansl-Schmuckler key-finding model, a standard in cognitive musicology. Each of the 24 major and minor keys has a distinct "Key Profile" distribution representing the hierarchical cognitive hierarchy of pitches. The application calculates the Pearson Correlation Coefficient between the live chroma buffer and these 24 key profiles in real-time. The key with the highest correlation coefficient is chosen as the Primary Key, and closely matching runner-ups are shown as Alternative Keys, minimizing errors caused by background noise or complex instrumental overtones.
               </p>
             </div>
 
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>5. 다이아토닉 코드(Diatonic Chords)와 화성적 기능</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>5. Diatonic Chords and Harmonic Functions</h3>
               <p style={{ margin: 0, marginBottom: '10px' }}>
-                특정 조성이 정해지면 해당 스케일의 음만으로 순차적으로 쌓아 올린 7개의 다이아토닉 코드(Diatonic Chords)가 정의됩니다. 각 화음은 곡의 전개 과정에서 아래와 같은 고유한 화성적 역할을 수행합니다.
+                Once a key is established, it defines seven diatonic chords built sequentially using only the notes belonging to that key's scale. Each chord performs a specific harmonic function:
               </p>
               <ul style={{ paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <li><strong>I도 (Tonic, 으뜸화음)</strong>: 조성의 출발점이자 최종 도착점 역할을 하는 가장 안정적인 화음입니다.</li>
-                <li><strong>IV도 (Subdominant, 버금딸림화음)</strong>: 조성에 풍부한 진행감을 더하며, 으뜸화음에서 딸림화음으로 전개할 때 매끄러운 징검다리 다리 역할을 수행합니다.</li>
-                <li><strong>V도 (Dominant, 딸림화음)</strong>: 강한 긴장감을 내포하고 있으며, 자연스럽게 안정적인 으뜸화음(I도)으로 해결하려는 강력한 성질(진행력)을 가집니다.</li>
+                <li><strong>I (Tonic)</strong>: The home chord of the key, providing the ultimate sense of rest, stability, and resolution.</li>
+                <li><strong>IV (Subdominant)</strong>: Adds movement and harmonic color, serving as an excellent bridge between the Tonic and the Dominant.</li>
+                <li><strong>V (Dominant)</strong>: Contains high tension and naturally drives a strong pull (resolution) back to the stable Tonic (I chord).</li>
               </ul>
               <p style={{ margin: 0, marginTop: '10px' }}>
-                WhichKey가 매핑해주는 다이아토닉 코드 표를 참고하면 복잡한 악보가 없는 즉석 잼 연주, 찬양팀 인도 시 유연한 연주 조율, 작곡 및 편곡 작업을 직관적으로 수월하게 이끌어갈 수 있습니다.
+                Referencing the diatonic chords mapped by WhichKey helps with impromptu jams when sheets are unavailable, coordinating band flow, and guiding songwriting or arrangement tasks.
               </p>
             </div>
 
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>6. 조바꿈(Transposition) 및 이조 연주 팁</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>6. Transposition & Capo Placement Tips</h3>
               <p style={{ margin: 0 }}>
-                가창자의 음역 대역이나 사용하는 악기 종류에 맞추어 연주 키를 바꿀 때 조바꿈 패널을 유용하게 쓸 수 있습니다. 반음(Semitone) 단위의 정밀한 이조 계산 기능을 탑재하여 현재 감지된 오리지널 키와 이조할 타겟 키 간의 세부 간격을 즉각 계산해 주며, 특히 어쿠스틱 기타리스트를 위한 카포(Capo) 프렛 매핑 정보와 이조악기(Bb, Eb) 연주자들을 위한 실음 환산 정보를 지원하여 리허설 현장에서 신속한 협업을 이끌어 냅니다.
+                The Transposition panel is highly useful when shifting keys to accommodate a singer's vocal range or different instruments. It computes the semitone distance between the original key and the target key. In addition, it provides capo fret recommendations for acoustic guitarists, and transposed pitch references for transposing instruments (such as B-flat and E-flat brass/woodwinds), facilitating rapid collaboration during rehearsals.
               </p>
             </div>
 
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>7. 템포(BPM) 측정 및 메트로놈 활용법</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>7. Tempo (BPM) Measurement & Metronome Practice</h3>
               <p style={{ margin: 0 }}>
-                BPM(Beats Per Minute)은 음악의 템포(속도)를 나타내는 국제적 정량 단위로, 1분당 박자 반복 횟수를 의미합니다. WhichKey는 드럼 타악 비트의 실시간 트랜지언트(Transient) 에너지를 포착하여 곡의 대략적인 속도를 자동 산출하는 자동 감지 모드와 연주를 들으며 탭 동작을 취해 측정하는 탭 템포(Tap Tempo) 모드를 지원합니다. 이렇게 측정 및 입력된 BPM 정보는 고정밀 웹 오디오 기반의 클릭 사운드 메트로놈과 즉각 동기화되어, 사용자가 완벽한 템포 감각으로 박자 흔들림 없는 개인 악기 연습 및 밴드 지휘를 영위하도록 지원합니다.
+                BPM (Beats Per Minute) is the standard measure of musical tempo. WhichKey supports both auto-detection (which monitors rhythmic transient peaks in drums and bass to calculate speed) and Tap Tempo (which lets users tap to the beat). The measured or typed BPM syncs instantly with the high-precision Web Audio metronome, enabling musicians to practice with perfect timing and maintain a steady tempo.
               </p>
             </div>
           </div>
@@ -606,12 +606,12 @@ function App() {
       {/* Footer & AdSense Compliance Policies */}
       <footer className="app-footer">
         <div className="footer-links">
-          <a href="/about.html" target="_blank" rel="noopener noreferrer">서비스 소개</a>
-          <a href="/privacy.html" target="_blank" rel="noopener noreferrer">개인정보처리방침</a>
-          <a href="/terms.html" target="_blank" rel="noopener noreferrer">이용약관</a>
+          <a href="/about.html">About</a>
+          <a href="/privacy.html">Privacy Policy</a>
+          <a href="/terms.html">Terms of Service</a>
         </div>
         <p>&copy; {new Date().getFullYear()} WhichKey. All Rights Reserved.</p>
-        <p style={{ fontSize: '11px', marginTop: '6px', opacity: 0.4 }}>모든 오디오 데이터는 브라우저 내부에서 실시간 로컬 분석을 거치며 서버로 전송되지 않습니다. (100% On-Device)</p>
+        <p style={{ fontSize: '11px', marginTop: '6px', opacity: 0.4 }}>All audio data is analyzed locally in real-time inside your browser and is never sent to a server (100% On-Device).</p>
       </footer>
     </div>
   );

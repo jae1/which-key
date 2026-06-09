@@ -221,8 +221,8 @@ export function useAudioEngine() {
       console.error('Microphone access error:', err);
       setErrorMsg(
         err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError'
-          ? '마이크 권한이 거부되었습니다. 설정에서 마이크 사용을 허용해 주세요.'
-          : '오디오 입력 장치를 불러오지 못했습니다. 기기를 확인해 주세요.'
+          ? 'Microphone permission denied. Please allow microphone access in your settings.'
+          : 'Failed to load audio input device. Please check your device.'
       );
       setIsMonitoring(false);
     }

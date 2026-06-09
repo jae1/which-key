@@ -149,7 +149,7 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
             onClick={() => adjustBpm(-5)} 
             className="btn-secondary" 
             style={{ width: '40px', height: '40px', borderRadius: '50%', padding: 0, fontSize: '12px', fontWeight: 600 }}
-            title="5 BPM 감소"
+            title="Decrease 5 BPM"
           >
             -5
           </button>
@@ -157,7 +157,7 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
             onClick={() => adjustBpm(-1)} 
             className="btn-secondary" 
             style={{ width: '36px', height: '36px', borderRadius: '50%', padding: 0, fontSize: '16px', fontWeight: 600 }}
-            title="1 BPM 감소"
+            title="Decrease 1 BPM"
           >
             -
           </button>
@@ -200,7 +200,7 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
                 padding: '2px 0',
                 margin: 0
               }}
-              title="BPM을 직접 숫자로 입력할 수 있습니다."
+              title="Enter BPM manually"
             />
             <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>BPM</span>
           </div>
@@ -209,7 +209,7 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
             onClick={() => adjustBpm(1)} 
             className="btn-secondary" 
             style={{ width: '36px', height: '36px', borderRadius: '50%', padding: 0, fontSize: '16px', fontWeight: 600 }}
-            title="1 BPM 증가"
+            title="Increase 1 BPM"
           >
             +
           </button>
@@ -217,7 +217,7 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
             onClick={() => adjustBpm(5)} 
             className="btn-secondary" 
             style={{ width: '40px', height: '40px', borderRadius: '50%', padding: 0, fontSize: '12px', fontWeight: 600 }}
-            title="5 BPM 증가"
+            title="Increase 5 BPM"
           >
             +5
           </button>
@@ -268,7 +268,7 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
           
           {/* Hybrid Time Signature Selector */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>박자:</span>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>Time:</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(128,128,128,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)', padding: '6px 8px' }}>
               
               {/* Numerator (Beats per measure) */}
@@ -281,7 +281,7 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
                   }}
                   className="btn-secondary" 
                   style={{ width: '36px', height: '22px', borderRadius: '4px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
-                  title="박자 수 증가"
+                  title="Increase beats per measure"
                 >
                   +
                 </button>
@@ -331,7 +331,7 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
                   }}
                   className="btn-secondary" 
                   style={{ width: '36px', height: '22px', borderRadius: '4px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
-                  title="박자 수 감소"
+                  title="Decrease beats per measure"
                 >
                   −
                 </button>
@@ -351,7 +351,7 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
                   }}
                   className="btn-secondary" 
                   style={{ width: '36px', height: '22px', borderRadius: '4px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
-                  title="음표 값 증가"
+                  title="Increase note value"
                 >
                   +
                 </button>
@@ -401,7 +401,7 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
                   }}
                   className="btn-secondary" 
                   style={{ width: '36px', height: '22px', borderRadius: '4px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
-                  title="음표 값 감소"
+                  title="Decrease note value"
                 >
                   −
                 </button>
@@ -421,14 +421,14 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}>
                   <rect x="4" y="4" width="16" height="16" rx="2" />
                 </svg>
-                정지
+                Stop
               </>
             ) : (
               <>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style={{ marginRight: '4px' }}>
                   <polygon points="5 3 19 12 5 21 5 3" />
                 </svg>
-                시작
+                Start
               </>
             )}
           </button>

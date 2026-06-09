@@ -31,7 +31,7 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
             className="btn-secondary" 
             style={{ padding: '3px 8px', fontSize: '10px', borderRadius: '4px' }}
           >
-            기록 초기화
+            Reset
           </button>
         )}
       </div>
@@ -63,7 +63,7 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
             {bpm ? bpm : '--'}
           </div>
           <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-            {isMonitoring ? '자동 비트 감지' : bpm ? '마지막 감지값' : '대기 중'}
+            {isMonitoring ? 'Auto Beat Detection' : bpm ? 'Last Detected' : 'Idle'}
           </span>
         </div>
 
@@ -83,7 +83,7 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
             height: '100%',
             textAlign: 'center'
           }}
-          title="이 카드 영역을 마우스 클릭하거나 터치하여 템포를 입력할 수 있습니다."
+          title="Click or tap this card to set tempo manually"
         >
           <span style={{ fontSize: '10px', fontWeight: 600, color: manualBpm > 0 ? 'var(--primary)' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             TAP
@@ -98,7 +98,7 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
             {manualBpm > 0 ? manualBpm : '--'}
           </div>
           <span style={{ fontSize: '10px', color: manualBpm > 0 ? 'var(--primary)' : 'var(--text-muted)', fontWeight: 500 }}>
-            {manualBpm > 0 ? '탭 입력값' : '여기를 눌러 탭'}
+            {manualBpm > 0 ? 'Tapped BPM' : 'Click/Tap Here'}
           </span>
         </div>
       </div>
@@ -115,7 +115,7 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
             }} 
           />
           <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-            {isMonitoring && bpm ? '템포 감지 작동 중' : '박자에 맞춰 카드나 아래 버튼을 탭하세요'}
+            {isMonitoring && bpm ? 'Tempo tracking active' : 'Tap the card or button to the beat'}
           </span>
         </div>
 

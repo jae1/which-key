@@ -43,61 +43,61 @@ interface ProgressionItem {
 
 const MAJOR_PROGRESSIONS: ProgressionItem[] = [
   {
-    name: '팝 머니 코드 (대중적인 팝송)',
+    name: 'Pop Money Chords',
     degrees: 'I - V - vi - IV',
     indices: [0, 4, 5, 3],
-    description: '전 세계 히트 팝송의 80% 이상에 사용된 가장 대중적이고 밝은 감성의 진행입니다.'
+    description: 'The most popular and uplifting progression, used in over 80% of hit songs worldwide.'
   },
   {
-    name: '4-5-3-6 진행 (서정적/J-Pop)',
+    name: '4-5-3-6 Progression (Emotional / J-Pop)',
     degrees: 'IV - V - iii - vi',
     indices: [3, 4, 2, 5],
-    description: '대중가요, J-Pop, 애니메이션 OST에서 극적인 감성과 아련함을 연출할 때 단골로 쓰입니다.'
+    description: 'Frequently used in pop, J-Pop, and anime OSTs to create dramatic tension and nostalgia.'
   },
   {
-    name: '2-5-1 진행 (재즈/시티팝)',
+    name: '2-5-1 Progression (Jazz / City Pop)',
     degrees: 'ii - V - I',
     indices: [1, 4, 0],
-    description: '재즈, R&B, 시티팝에서 곡의 긴장감을 예쁘게 해결하는 가장 중요한 기본 진행입니다.'
+    description: 'The most critical progression in Jazz, R&B, and City Pop to elegantly resolve harmonic tension.'
   },
   {
-    name: '캐논 진행 (클래식/가요)',
+    name: 'Canon Progression (Classic / Pop)',
     degrees: 'I - V - vi - iii - IV - I - IV - V',
     indices: [0, 4, 5, 2, 3, 0, 3, 4],
-    description: '파헬벨의 캐논에서 유래했으며 서정적이고 흐름이 매우 매끄럽고 안정적입니다.'
+    description: 'Derived from Pachelbel\'s Canon; extremely smooth, lyrical, and stable.'
   },
   {
-    name: '1-6-2-5 턴어라운드 (레트로/재즈)',
+    name: '1-6-2-5 Turnaround (Retro / Jazz)',
     degrees: 'I - vi - ii - V',
     indices: [0, 5, 1, 4],
-    description: '복고풍 발라드, 오래된 팝송, 혹은 재즈 곡 중간에 반복 연주 구간에서 단골로 쓰입니다.'
+    description: 'Mainly used in retro ballads, classic pop, or repeating sections of Jazz tunes.'
   }
 ];
 
 const MINOR_PROGRESSIONS: ProgressionItem[] = [
   {
-    name: '마이너 머니 코드 (애절한 팝)',
+    name: 'Minor Money Chords (Sad Pop)',
     degrees: 'i - VI - III - VII',
     indices: [0, 5, 2, 6],
-    description: '어두우면서도 희망이 비치는 느낌을 주는 웅장하고 감정선이 깊은 대표 마이너 진행입니다.'
+    description: 'A classic minor progression that carries a dark, epic vibe with a touch of hope.'
   },
   {
-    name: '마이너 2-5-1 진행 (재즈/R&B)',
+    name: 'Minor 2-5-1 Progression (Jazz / R&B)',
     degrees: 'ii° - v - i',
     indices: [1, 4, 0],
-    description: '다크하고 성숙한 분위기를 만드는 진행으로, 마이너 재즈나 알앤비 곡에 필수적입니다.'
+    description: 'Essential in minor Jazz and R&B for creating dark, sophisticated moods.'
   },
   {
-    name: '안달루시아 진행 (라틴/스페니시)',
+    name: 'Andalusian Cadence (Latin / Spanish)',
     degrees: 'i - VII - VI - V',
     indices: [0, 6, 5, 4],
-    description: '이국적이고 드라마틱한 스페인 풍 분위기를 연출할 때 매우 자주 쓰이는 진행입니다.'
+    description: 'An exotic, dramatic cadence widely used to create a Spanish or Latin flavor.'
   },
   {
-    name: '마이너 센티멘탈 진행',
+    name: 'Minor Sentimental Progression',
     degrees: 'i - iv - VII - III',
     indices: [0, 3, 6, 2],
-    description: '센티멘탈하고 쓸쓸한 분위기를 풍기며, 발라드 곡의 벌스(Verse)에 잘 어울립니다.'
+    description: 'Evokes a melancholic, lonely mood; fits beautifully in ballad verses.'
   }
 ];
 
@@ -167,10 +167,10 @@ export function Transposition({ detectedKey }: TranspositionProps) {
             {isLive ? (
               <>
                 <span className="pulse-dot" />
-                실시간 분석 중
+                Live Analyzing
               </>
             ) : (
-              '수동 변환 모드'
+              'Manual Mode'
             )}
           </span>
         </div>
@@ -182,21 +182,21 @@ export function Transposition({ detectedKey }: TranspositionProps) {
             className={`tab-btn ${activeTab === 'target' ? 'active' : ''}`}
             style={{ padding: '3px 8px', fontSize: '11px', borderRadius: '4px' }}
           >
-            목표 키 변환
+            Target Transpose
           </button>
           <button 
             onClick={() => setActiveTab('matrix')}
             className={`tab-btn ${activeTab === 'matrix' ? 'active' : ''}`}
             style={{ padding: '3px 8px', fontSize: '11px', borderRadius: '4px' }}
           >
-            12키 매트릭스
+            12-Key Matrix
           </button>
           <button 
             onClick={() => setActiveTab('progressions')}
             className={`tab-btn ${activeTab === 'progressions' ? 'active' : ''}`}
             style={{ padding: '3px 8px', fontSize: '11px', borderRadius: '4px' }}
           >
-            추천 진행
+            Suggested Progressions
           </button>
         </div>
       </div>
@@ -212,7 +212,7 @@ export function Transposition({ detectedKey }: TranspositionProps) {
               
               {/* Source Key (Disabled if live, enabled if manual) */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>기준 키 (Source):</span>
+                <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>Source Key:</span>
                 {isLive ? (
                   <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--primary)' }}>{sourceKeyName}</span>
                 ) : (
@@ -242,7 +242,7 @@ export function Transposition({ detectedKey }: TranspositionProps) {
 
               {/* Target Key Selector */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>목표 키 (Target):</span>
+                <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>Target Key:</span>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <select 
                     value={targetKeyIndex} 
@@ -268,9 +268,9 @@ export function Transposition({ detectedKey }: TranspositionProps) {
 
               {/* Difference readout */}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', borderTop: '1px dashed var(--border-color)', paddingTop: '6px', marginTop: '2px', color: 'var(--text-muted)' }}>
-                <span>이조 차이 (Interval Diff)</span>
+                <span>Interval Diff</span>
                 <span style={{ fontWeight: 700, color: semitoneDiff === 0 ? 'var(--text-secondary)' : 'var(--secondary)' }}>
-                  {semitoneDiff === 0 ? '동일 키' : semitoneDiff > 0 ? `+${semitoneDiff} 반음 (Up)` : `${semitoneDiff} 반음 (Down)`}
+                  {semitoneDiff === 0 ? 'Same Key' : semitoneDiff > 0 ? `+${semitoneDiff} semitones (Up)` : `${semitoneDiff} semitones (Down)`}
                 </span>
               </div>
             </div>
@@ -280,7 +280,7 @@ export function Transposition({ detectedKey }: TranspositionProps) {
               {/* Original Chords */}
               <div>
                 <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                  기준 키 ({NOTE_NAMES[sourceRoot]} {sourceIsMajor ? 'maj' : 'min'})
+                  Source Key ({NOTE_NAMES[sourceRoot]} {sourceIsMajor ? 'maj' : 'min'})
                 </span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {sourceChords.map((c, idx) => (
@@ -295,7 +295,7 @@ export function Transposition({ detectedKey }: TranspositionProps) {
               {/* Target Chords */}
               <div>
                 <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--primary)', display: 'block', marginBottom: '6px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                  목표 키 ({NOTE_NAMES[targetKeyIndex]} {targetMode ? 'maj' : 'min'})
+                  Target Key ({NOTE_NAMES[targetKeyIndex]} {targetMode ? 'maj' : 'min'})
                 </span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {targetChords.map((c, idx) => (
@@ -314,7 +314,7 @@ export function Transposition({ detectedKey }: TranspositionProps) {
         {activeTab === 'matrix' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', overflowX: 'auto' }}>
             <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '2px' }}>
-              * {sourceIsMajor ? 'Major' : 'Minor'} 스케일 모드 기준 12개 키 화성 표
+              * Diatonic Chord Matrix for 12 Keys in {sourceIsMajor ? 'Major' : 'Minor'} Scale
             </span>
             
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', fontSize: '11px', minWidth: '400px' }}>
@@ -356,7 +356,7 @@ export function Transposition({ detectedKey }: TranspositionProps) {
         {activeTab === 'progressions' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '2px' }}>
-              * {sourceIsMajor ? 'Major' : 'Minor'} 키에서 감지/선택된 대표 코드 진행들입니다.
+              * Popular chord progressions in the active {sourceIsMajor ? 'Major' : 'Minor'} key.
             </span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '350px', overflowY: 'auto', paddingRight: '4px' }}>
               {(sourceIsMajor ? MAJOR_PROGRESSIONS : MINOR_PROGRESSIONS).map((prog, idx) => {

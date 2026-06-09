@@ -46,8 +46,8 @@ export function KeyDisplay({
     return (
       <div style={{ width: '100%', margin: '4px 0 8px', opacity: isMonitoring ? 1 : 0.4, transition: 'opacity 0.2s ease' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', marginBottom: '4px' }}>
-          <span>마이크 레벨 (Mic Level)</span>
-          <span>{isMonitoring ? `${inputLevel}%` : '대기 중'}</span>
+          <span>Mic Level</span>
+          <span>{isMonitoring ? `${inputLevel}%` : 'Idle'}</span>
         </div>
         <div style={{ width: '100%', height: '4px', backgroundColor: 'var(--border-color)', borderRadius: '2px', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
           <div 
@@ -89,9 +89,9 @@ export function KeyDisplay({
               <line x1="8" y1="23" x2="16" y2="23"/>
             </svg>
           </div>
-          <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px', fontSize: '13px' }}>오디오 입력 대기 중</h4>
+          <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px', fontSize: '13px' }}>Waiting for Audio</h4>
           <p style={{ fontSize: '11px', maxWidth: '240px', color: 'var(--text-secondary)', marginBottom: '4px', lineHeight: 1.25 }}>
-            분석을 시작하면 오디오 소리를 실시간 감지합니다.
+            Starts analyzing sound once active.
           </p>
         </div>
         
@@ -110,7 +110,7 @@ export function KeyDisplay({
               boxShadow: '0 4px 12px rgba(var(--primary-rgb), 0.15)'
             }}
           >
-            실시간 키 감지 시작
+            Start Key Detection
           </button>
         </div>
       </div>
@@ -130,9 +130,9 @@ export function KeyDisplay({
             borderTopColor: 'var(--primary)',
             marginBottom: '8px'
           }} />
-          <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px', fontSize: '13px' }}>음향 신호 대기 중...</h4>
+          <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px', fontSize: '13px' }}>Listening...</h4>
           <p style={{ fontSize: '11px', maxWidth: '240px', color: 'var(--text-secondary)', marginBottom: '4px', lineHeight: 1.25 }}>
-            마이크나 악기 소리를 연주해 보세요.
+            Play an instrument or make sound.
           </p>
         </div>
         
@@ -150,7 +150,7 @@ export function KeyDisplay({
               height: '36px'
             }}
           >
-            분석 중지
+            Stop Analysis
           </button>
         </div>
       </div>
@@ -182,7 +182,7 @@ export function KeyDisplay({
         {/* Confidence Progress Bar */}
         <div style={{ maxWidth: '180px', margin: '0 auto 4px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', marginBottom: '2px', fontWeight: 500 }}>
-            <span style={{ color: 'var(--text-secondary)' }}>신뢰도</span>
+            <span style={{ color: 'var(--text-secondary)' }}>Confidence</span>
             <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{confidence}%</span>
           </div>
           <div style={{ width: '100%', height: '3px', backgroundColor: 'var(--border-color)', borderRadius: '1.5px', overflow: 'hidden' }}>
@@ -202,19 +202,19 @@ export function KeyDisplay({
       {/* Key Relationship Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
         <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 6px' }}>
-          <span style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>나란한 조 (Relative)</span>
+          <span style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>Relative Key</span>
           <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--primary)' }}>{relativeKey}</div>
         </div>
         <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 6px' }}>
-          <span style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>같은으뜸음조 (Parallel)</span>
+          <span style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>Parallel Key</span>
           <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)' }}>{parallelKey}</div>
         </div>
         <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 6px' }}>
-          <span style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>버금딸림음 (IV)</span>
+          <span style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>Subdominant (IV)</span>
           <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)' }}>{subdominant}</div>
         </div>
         <div style={{ background: 'rgba(128,128,128,0.01)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '4px 6px' }}>
-          <span style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>딸림음 (V)</span>
+          <span style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 500 }}>Dominant (V)</span>
           <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)' }}>{dominant}</div>
         </div>
       </div>
@@ -222,7 +222,7 @@ export function KeyDisplay({
       {/* Alternative Candidates */}
       <div>
         <span style={{ fontSize: '8px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '2px' }}>
-          후보 키 (Candidates)
+          Candidates
         </span>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {alternativeKeys.slice(0, 2).map((item, idx) => {
@@ -258,7 +258,7 @@ export function KeyDisplay({
               height: '36px'
             }}
           >
-            분석 중지
+            Stop Analysis
           </button>
         ) : (
           <button
@@ -273,7 +273,7 @@ export function KeyDisplay({
               height: '36px'
             }}
           >
-            새 분석 시작
+            Start New Analysis
           </button>
         )}
       </div>

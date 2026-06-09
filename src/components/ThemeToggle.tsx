@@ -39,8 +39,8 @@ export function ThemeToggle() {
     <button
       onClick={toggleTheme}
       className="btn-secondary"
-      aria-label="화면 테마 변경"
-      title={`${theme === 'light' ? '다크 모드' : '라이트 모드'}로 변경`}
+      aria-label="Toggle theme"
+      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
       style={{ padding: '8px 10px', borderRadius: '10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
     >
       {theme === 'light' ? (
