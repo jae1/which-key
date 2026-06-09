@@ -67,50 +67,52 @@ export function KeyDisplay({
   // 1. Idle state (no key detected and not monitoring)
   if (!detectedKey && !isMonitoring) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, textAlign: 'center', padding: '12px 0 4px' }}>
-        <div style={{
-          width: '56px',
-          height: '56px',
-          borderRadius: '50%',
-          background: 'var(--primary-glow)',
-          color: 'var(--primary)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '12px',
-          border: '1px solid var(--panel-border)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-            <line x1="12" y1="19" x2="12" y2="23"/>
-            <line x1="8" y1="23" x2="16" y2="23"/>
-          </svg>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '380px', width: '100%', padding: '4px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, textAlign: 'center', padding: '12px 0 0' }}>
+          <div style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            background: 'var(--primary-glow)',
+            color: 'var(--primary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '12px',
+            border: '1px solid var(--panel-border)',
+            boxShadow: 'var(--shadow-sm)'
+          }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="23"/>
+              <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+          </div>
+          <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', fontSize: '15px' }}>오디오 입력 대기 중</h4>
+          <p style={{ fontSize: '13px', maxWidth: '280px', color: 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.4 }}>
+            마이크 권한을 수락하고 분석을 시작하면 주변 기기나 연주 소리를 실시간으로 분석합니다.
+          </p>
         </div>
-        <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', fontSize: '15px' }}>오디오 입력 대기 중</h4>
-        <p style={{ fontSize: '13px', maxWidth: '280px', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: 1.4 }}>
-          마이크 권한을 수락하고 분석을 시작하면 주변 기기나 연주 소리를 실시간으로 분석합니다.
-        </p>
         
-        {renderMicLevel()}
-        
-        <button
-          onClick={onStartMonitoring}
-          className="btn-primary"
-          style={{
-            marginTop: '8px',
-            padding: '10px 24px',
-            fontSize: '14px',
-            fontWeight: 600,
-            borderRadius: '8px',
-            width: '100%',
-            maxWidth: '220px',
-            boxShadow: '0 4px 12px rgba(var(--primary-rgb), 0.2)'
-          }}
-        >
-          실시간 키 감지 시작
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+          {renderMicLevel()}
+          <button
+            onClick={onStartMonitoring}
+            className="btn-primary"
+            style={{
+              width: '100%',
+              padding: '10px 24px',
+              fontSize: '14px',
+              fontWeight: 600,
+              borderRadius: '8px',
+              height: '40px',
+              boxShadow: '0 4px 12px rgba(var(--primary-rgb), 0.2)'
+            }}
+          >
+            실시간 키 감지 시작
+          </button>
+        </div>
       </div>
     );
   }
@@ -118,39 +120,46 @@ export function KeyDisplay({
   // 2. Monitoring started, but no key detected yet
   if (isMonitoring && !detectedKey) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, textAlign: 'center', padding: '30px 20px' }}>
-        <div className="loader-spin" style={{
-          width: '28px',
-          height: '28px',
-          borderRadius: '50%',
-          border: '2.5px solid var(--border-color)',
-          borderTopColor: 'var(--primary)',
-          marginBottom: '16px'
-        }} />
-        <p style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '4px' }}>음향 신호 대기 중...</p>
-        <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }}>마이크나 악기 소리를 연주해 보세요.</p>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '380px', width: '100%', padding: '4px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexGrow: 1, textAlign: 'center', padding: '12px 0 0' }}>
+          <div className="loader-spin" style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            border: '3px solid var(--border-color)',
+            borderTopColor: 'var(--primary)',
+            marginBottom: '16px'
+          }} />
+          <h4 style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px', fontSize: '15px' }}>음향 신호 대기 중...</h4>
+          <p style={{ fontSize: '13px', maxWidth: '280px', color: 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.4 }}>
+            마이크나 악기 소리를 연주해 보세요.
+          </p>
+        </div>
         
-        {renderMicLevel()}
-        
-        <button
-          onClick={onStopMonitoring}
-          className="btn-secondary"
-          style={{
-            marginTop: '12px',
-            padding: '6px 16px',
-            fontSize: '12px',
-            borderRadius: '6px'
-          }}
-        >
-          중지
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%' }}>
+          {renderMicLevel()}
+          <button
+            onClick={onStopMonitoring}
+            className="btn-danger"
+            style={{
+              width: '100%',
+              padding: '10px 24px',
+              fontSize: '14px',
+              fontWeight: 600,
+              borderRadius: '8px',
+              height: '40px'
+            }}
+          >
+            분석 중지
+          </button>
+        </div>
       </div>
     );
   }
 
   // 3. Active key detected (shows real-time results or last-held results)
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flexGrow: 1, gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '380px', width: '100%', padding: '4px 0', gap: '16px' }}>
       <div style={{ textAlign: 'center', padding: '4px 0' }}>
         <span style={{ 
           fontSize: '10px', 
@@ -227,13 +236,20 @@ export function KeyDisplay({
       </div>
 
       {/* Mic Level and Action button inside panel */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto', width: '100%' }}>
         {renderMicLevel()}
         {isMonitoring ? (
           <button
             onClick={onStopMonitoring}
             className="btn-danger"
-            style={{ width: '100%', padding: '8px', fontSize: '13px', borderRadius: '8px' }}
+            style={{
+              width: '100%',
+              padding: '10px 24px',
+              fontSize: '14px',
+              fontWeight: 600,
+              borderRadius: '8px',
+              height: '40px'
+            }}
           >
             분석 중지
           </button>
@@ -241,7 +257,14 @@ export function KeyDisplay({
           <button
             onClick={onStartMonitoring}
             className="btn-primary"
-            style={{ width: '100%', padding: '8px', fontSize: '13px', borderRadius: '8px' }}
+            style={{
+              width: '100%',
+              padding: '10px 24px',
+              fontSize: '14px',
+              fontWeight: 600,
+              borderRadius: '8px',
+              height: '40px'
+            }}
           >
             새 분석 시작
           </button>
