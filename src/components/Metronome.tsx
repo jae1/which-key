@@ -9,8 +9,8 @@ interface MetronomeProps {
 export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
   const [bpm, setBpm] = useState(currentBpm > 0 ? currentBpm : 120);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [beatsPerMeasure, setBeatsPerMeasure] = useState(4); // Numerator (default 4)
-  const [beatValue, setBeatValue] = useState(4); // Denominator (default 4)
+  const [beatsPerMeasure, setBeatsPerMeasure] = useState(4); // Numerator
+  const [beatValue, setBeatValue] = useState(4); // Denominator
   const [currentBeat, setCurrentBeat] = useState(0);
 
   // Sync with currentBpm if it changes and is valid
@@ -169,10 +169,9 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
               onChange={(e) => {
                 const val = parseInt(e.target.value);
                 if (!isNaN(val)) {
-                  // Allow typing, clamp loosely to 300 during typing
                   setBpm(Math.min(300, Math.max(0, val)));
                 } else {
-                  setBpm(0); // Allow clearing input temporary
+                  setBpm(0);
                 }
               }}
               onBlur={() => {
@@ -227,12 +226,12 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
         {/* Large, High-Visibility Beat Ticks */}
         <div style={{ 
           display: 'flex', 
-          gap: '10px', 
-          margin: '12px 0', 
-          flexWrap: 'wrap', 
+          gap: beatsPerMeasure > 8 ? '4px' : '8px', 
+          margin: '4px 0', 
+          flexWrap: 'nowrap', 
           justifyContent: 'center', 
           width: '100%',
-          maxWidth: '280px',
+          maxWidth: '320px',
           padding: '4px',
           background: 'rgba(128,128,128,0.01)',
           border: '1px solid var(--border-color)',
@@ -245,8 +244,8 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
               <div
                 key={i}
                 style={{
-                  flexGrow: 1,
-                  minWidth: '40px',
+                  flex: 1,
+                  minWidth: '4px',
                   maxWidth: '60px',
                   height: '24px',
                   borderRadius: '6px',
@@ -267,38 +266,147 @@ export function Metronome({ currentBpm, getAudioContext }: MetronomeProps) {
         {/* Controls row */}
         <div style={{ display: 'flex', gap: '16px', width: '100%', alignItems: 'center', justifyContent: 'center', marginTop: '4px' }}>
           
-          {/* Custom Time Signature Selector (Numerator / Denominator separately) */}
+          {/* Hybrid Time Signature Selector */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 500 }}>박자:</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <select 
-                value={beatsPerMeasure} 
-                onChange={(e) => {
-                  setBeatsPerMeasure(Number(e.target.value));
-                  beatIndexRef.current = 0;
-                  setCurrentBeat(0);
-                }} 
-                className="select-input"
-                style={{ padding: '6px 8px', fontSize: '13px', minWidth: '48px', textAlign: 'center' }}
-                title="마디당 비트 수 (분자)"
-              >
-                {Array.from({ length: 16 }, (_, i) => i + 1).map(num => (
-                  <option key={num} value={num}>{num}</option>
-                ))}
-              </select>
-              <span style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: 'bold' }}>/</span>
-              <select 
-                value={beatValue} 
-                onChange={(e) => setBeatValue(Number(e.target.value))} 
-                className="select-input"
-                style={{ padding: '6px 8px', fontSize: '13px', minWidth: '48px', textAlign: 'center' }}
-                title="비트 단위 (분모)"
-              >
-                <option value="2">2</option>
-                <option value="4">4</option>
-                <option value="8">8</option>
-                <option value="16">16</option>
-              </select>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>박자:</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(128,128,128,0.02)', borderRadius: '10px', border: '1px solid var(--border-color)', padding: '6px 8px' }}>
+              
+              {/* Numerator (Beats per measure) */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
+                <button 
+                  onClick={() => {
+                    setBeatsPerMeasure(prev => Math.min(16, prev + 1));
+                    beatIndexRef.current = 0;
+                    setCurrentBeat(0);
+                  }}
+                  className="btn-secondary" 
+                  style={{ width: '36px', height: '22px', borderRadius: '4px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
+                  title="박자 수 증가"
+                >
+                  +
+                </button>
+                <div style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'var(--bg-secondary, rgba(128,128,128,0.08))',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '6px',
+                  width: '36px',
+                  height: '36px',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                }}>
+                  <span style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--primary)' }}>{beatsPerMeasure}</span>
+                  <select
+                    value={beatsPerMeasure}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      setBeatsPerMeasure(val);
+                      beatIndexRef.current = 0;
+                      setCurrentBeat(0);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      opacity: 0,
+                      cursor: 'pointer',
+                      WebkitAppearance: 'none',
+                    }}
+                  >
+                    {Array.from({ length: 16 }, (_, i) => i + 1).map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+                <button 
+                  onClick={() => {
+                    setBeatsPerMeasure(prev => Math.max(1, prev - 1));
+                    beatIndexRef.current = 0;
+                    setCurrentBeat(0);
+                  }}
+                  className="btn-secondary" 
+                  style={{ width: '36px', height: '22px', borderRadius: '4px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
+                  title="박자 수 감소"
+                >
+                  −
+                </button>
+              </div>
+
+              <span style={{ color: 'var(--text-muted)', fontSize: '15px', fontWeight: 'bold', margin: '0 2px', userSelect: 'none' }}>/</span>
+
+              {/* Denominator (Beat value) */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
+                <button 
+                  onClick={() => {
+                    const denominatorOptions = [2, 4, 8, 16];
+                    const currentIndex = denominatorOptions.indexOf(beatValue);
+                    if (currentIndex < denominatorOptions.length - 1) {
+                      setBeatValue(denominatorOptions[currentIndex + 1]);
+                    }
+                  }}
+                  className="btn-secondary" 
+                  style={{ width: '36px', height: '22px', borderRadius: '4px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
+                  title="음표 값 증가"
+                >
+                  +
+                </button>
+                <div style={{
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'var(--bg-secondary, rgba(128,128,128,0.08))',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '6px',
+                  width: '36px',
+                  height: '36px',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                }}>
+                  <span style={{ fontSize: '15px', fontWeight: 'bold', color: 'var(--primary)' }}>{beatValue}</span>
+                  <select
+                    value={beatValue}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      setBeatValue(val);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      opacity: 0,
+                      cursor: 'pointer',
+                      WebkitAppearance: 'none',
+                    }}
+                  >
+                    {[2, 4, 8, 16].map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
+                <button 
+                  onClick={() => {
+                    const denominatorOptions = [2, 4, 8, 16];
+                    const currentIndex = denominatorOptions.indexOf(beatValue);
+                    if (currentIndex > 0) {
+                      setBeatValue(denominatorOptions[currentIndex - 1]);
+                    }
+                  }}
+                  className="btn-secondary" 
+                  style={{ width: '36px', height: '22px', borderRadius: '4px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'bold' }}
+                  title="음표 값 감소"
+                >
+                  −
+                </button>
+              </div>
+
             </div>
           </div>
 

@@ -516,3 +516,12 @@ input[type="number"] {
   border-color: var(--primary) !important;
   box-shadow: 0 0 12px rgba(var(--primary-rgb), 0.1);
 }
+
+/* Hide scrollbars for iOS wheel picker */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
