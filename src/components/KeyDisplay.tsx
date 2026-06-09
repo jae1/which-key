@@ -31,7 +31,7 @@ export function KeyDisplay({ detectedKey, confidence, alternativeKeys, isMonitor
   const { subdominant, dominant } = detectedKey ? getRelatedKeys(root, isMajor) : { subdominant: '', dominant: '' };
 
   return (
-    <div className="panel" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '380px' }}>
+    <div className="panel" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-secondary)' }}>감지된 키 (Key)</h3>
         {isMonitoring && detectedKey && (

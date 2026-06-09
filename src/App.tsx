@@ -93,21 +93,15 @@ function App() {
       {/* 3. Main Dashboard Grid */}
       <main className="app-grid">
         
-        {/* Left Column (Visualizer & Action controls, Transposer) */}
+        {/* Column 1: 오디오 분석 (Chroma Wheel) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* Main Visualizer and Control Panel */}
           <div className="panel" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '12px' }}>크로마 휠 (Chroma Wheel)</h2>
-
-            {/* Circular Canvas Visualizer */}
             <ChromaWheel 
               chromagram={chromagram} 
               inputLevel={inputLevel} 
               isMonitoring={isMonitoring} 
             />
-
-            {/* Input Audio Level Meter (Horizontal Bar) */}
             {isMonitoring && (
               <div style={{ width: '100%', maxWidth: '240px', margin: '8px 0 16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', marginBottom: '4px' }}>
@@ -127,8 +121,6 @@ function App() {
                 </div>
               </div>
             )}
-
-            {/* Start / Stop Button */}
             <button
               onClick={toggleMonitoring}
               className={isMonitoring ? 'btn-danger' : 'btn-primary'}
@@ -159,24 +151,21 @@ function App() {
               )}
             </button>
           </div>
-
-          {/* Diatonic Chord Transposer */}
-          <Transposition detectedKey={detectedKey} />
-
         </div>
 
-        {/* Right Column (Detected Key, BPM tracker, Metronome, Ads) */}
+        {/* Column 2: 음악 키 분석 및 조바꿈 계산기 */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
-          {/* Real-time Key Display */}
           <KeyDisplay 
             detectedKey={detectedKey}
             confidence={confidence}
             alternativeKeys={alternativeKeys}
             isMonitoring={isMonitoring}
           />
+          <Transposition detectedKey={detectedKey} />
+        </div>
 
-          {/* BPM display */}
+        {/* Column 3: 템포, 메트로놈, 광고 */}
+        <div className="grid-col-3" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <BpmDisplay 
             bpm={bpm}
             isBeat={isBeat}
@@ -185,18 +174,12 @@ function App() {
             resetBpm={resetBpm}
             isMonitoring={isMonitoring}
           />
-
-          {/* Precision Metronome */}
           <Metronome 
             currentBpm={manualBpm > 0 ? manualBpm : (bpm || 120)}
             getAudioContext={getAudioContext}
           />
-
-          {/* Sidebar Ad Slot */}
           <AdSlot type="sidebar" />
-
         </div>
-
       </main>
 
       {/* Bottom Horizontal Ad Slot */}

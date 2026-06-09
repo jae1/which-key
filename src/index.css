@@ -140,6 +140,7 @@ p {
   padding: 24px;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0; /* Prevent collapsing under any flex layouts */
 }
 
 .panel:hover {
@@ -306,11 +307,27 @@ button:disabled, .btn:disabled {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
+  align-items: start; /* Prevent cards from stretching vertically */
 }
 
-@media (min-width: 900px) {
+@media (min-width: 768px) and (max-width: 1024px) {
   .app-grid {
-    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-columns: 1fr 1fr;
+  }
+  .grid-col-3 {
+    grid-column: span 2;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .grid-col-3 > :last-child {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 1025px) {
+  .app-grid {
+    grid-template-columns: 0.95fr 1.1fr 0.95fr;
   }
 }
 

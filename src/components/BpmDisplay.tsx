@@ -21,7 +21,7 @@ export function BpmDisplay({ bpm, isBeat, manualBpm, tapTempo, resetBpm, isMonit
   }, [isBeat]);
 
   return (
-    <div className="panel" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '340px' }}>
+    <div className="panel" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-secondary)' }}>템포 (BPM)</h3>
         {(bpm || manualBpm > 0) && (
