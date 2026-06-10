@@ -6,7 +6,7 @@ export class BpmTracker {
   private lastBeatTime = 0;
   
   // Settings
-  private thresholdMultiplier = 1.35; // How much higher than average the peak must be
+  private thresholdMultiplier = 1.22; // How much higher than average the peak must be (lowered to 1.22 for better transient capture)
   private minBeatInterval = 280;      // ~214 BPM max
   private maxBeatInterval = 1200;     // ~50 BPM min
   
@@ -25,9 +25,9 @@ export class BpmTracker {
   public processFrame(frequencyData: Float32Array, sampleRate: number, fftSize: number): boolean {
     const binSize = sampleRate / fftSize;
     
-    // Sum energy in the bass range (20 Hz to 150 Hz)
-    const lowFreqLimit = 20;
-    const highFreqLimit = 150;
+    // Sum energy in the mid-bass range (50 Hz to 250 Hz) for better laptop mic response
+    const lowFreqLimit = 50;
+    const highFreqLimit = 250;
     const startBin = Math.max(0, Math.floor(lowFreqLimit / binSize));
     const endBin = Math.min(frequencyData.length - 1, Math.ceil(highFreqLimit / binSize));
     

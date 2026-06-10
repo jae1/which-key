@@ -160,7 +160,6 @@ function App() {
     detectedKey,
     detectedChord,
     confidence,
-    alternativeKeys,
     chromagram,
     bpm,
     isBeat,
@@ -169,6 +168,9 @@ function App() {
     resetBpm,
     inputLevel,
     getAudioContext,
+    isAnalyzingSong,
+    analysisCountdown,
+    startSongAnalysis,
   } = useAudioEngine();
 
   const [isGuideCollapsed, setIsGuideCollapsed] = useState(true);
@@ -372,12 +374,14 @@ function App() {
               detectedKey={detectedKey}
               detectedChord={detectedChord}
               confidence={confidence}
-              alternativeKeys={alternativeKeys}
               isMonitoring={isMonitoring}
               inputLevel={inputLevel}
               onStartMonitoring={startMonitoring}
               onStopMonitoring={stopMonitoring}
               hideHeader={true}
+              isAnalyzingSong={isAnalyzingSong}
+              analysisCountdown={analysisCountdown}
+              onStartSongAnalysis={startSongAnalysis}
             />
           );
         case 'metronome':

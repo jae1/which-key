@@ -16,6 +16,10 @@ export function useAudioEngine() {
   const [manualBpm, setManualBpm] = useState<number>(0);
   const [inputLevel, setInputLevel] = useState<number>(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  
+  // Song Analyzer states
+  const [isAnalyzingSong, setIsAnalyzingSong] = useState(false);
+  const [analysisCountdown, setAnalysisCountdown] = useState(0);
 
   // Audio nodes and context refs
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -32,6 +36,10 @@ export function useAudioEngine() {
   const smoothingFactor = 0.985; // High value for extremely slow, stable key detection (takes 5-6 seconds to adjust)
   const smoothedChromaChordRef = useRef<number[]>(new Array(12).fill(0));
   const chordSmoothingFactor = 0.88; // Lower value for snappy chord detection (~300ms response)
+
+  // Song Analyzer refs
+  const accumulatedChromaRef = useRef<number[]>(new Array(12).fill(0));
+  const analysisTimerRef = useRef<number | null>(null);
 
   // Precalculated mapping from FFT bin to pitch class
   const binToPitchClassRef = useRef<number[]>([]);
@@ -111,10 +119,45 @@ export function useAudioEngine() {
         }
       }
 
-      // Apply exponential moving average (smoothing) to chromagram
-      const smoothedChroma = smoothedChromaRef.current;
-      for (let i = 0; i < 12; i++) {
-        smoothedChroma[i] = (smoothedChroma[i] * smoothingFactor) + (rawChroma[i] * (1 - smoothingFactor));
+      // If we are performing a long-term song analysis, accumulate energy
+      if (isAnalyzingSong) {
+        const accumulatedChroma = accumulatedChromaRef.current;
+        for (let i = 0; i < 12; i++) {
+          accumulatedChroma[i] += rawChroma[i];
+        }
+        
+        // Show accumulated chroma on Chroma Wheel
+        const maxChroma = Math.max(...accumulatedChroma);
+        const normalizedChroma = accumulatedChroma.map(val => maxChroma > 0 ? val / maxChroma : 0);
+        setChromagram(normalizedChroma);
+      } else {
+        // Apply exponential moving average (smoothing) to chromagram (Live Monitor Mode)
+        const smoothedChroma = smoothedChromaRef.current;
+        for (let i = 0; i < 12; i++) {
+          smoothedChroma[i] = (smoothedChroma[i] * smoothingFactor) + (rawChroma[i] * (1 - smoothingFactor));
+        }
+
+        // Normalize smoothed chromagram for UI rendering (0 to 1 scale)
+        const maxChroma = Math.max(...smoothedChroma);
+        const normalizedChroma = smoothedChroma.map(val => maxChroma > 0 ? val / maxChroma : 0);
+        setChromagram(normalizedChroma);
+
+        // 3. Find the musical key using Krumhansl-Schmuckler correlation
+        const keyResults = findKey(smoothedChroma);
+        if (keyResults.length > 0) {
+          const topMatch = keyResults[0];
+          // Only set key if correlation (confidence) is reasonably positive
+          if (topMatch.correlation > 0.3) {
+            setDetectedKey(topMatch.keyName);
+            // Scale correlation (usually 0.4 to 0.8) to a percentage (0 to 100)
+            const confPercent = Math.min(100, Math.max(0, Math.round((topMatch.correlation - 0.2) * 166)));
+            setConfidence(confPercent);
+            setAlternativeKeys(keyResults.slice(1, 5)); // Next 4 keys
+          } else {
+            // If correlation is too low, don't change detected key, but lower confidence
+            setConfidence(prev => Math.max(0, prev - 1));
+          }
+        }
       }
 
       // Apply fast exponential moving average (smoothing) to chord chromagram
@@ -123,34 +166,12 @@ export function useAudioEngine() {
         smoothedChromaChord[i] = (smoothedChromaChord[i] * chordSmoothingFactor) + (rawChroma[i] * (1 - chordSmoothingFactor));
       }
 
-      // Normalize smoothed chromagram for UI rendering (0 to 1 scale)
-      const maxChroma = Math.max(...smoothedChroma);
-      const normalizedChroma = smoothedChroma.map(val => maxChroma > 0 ? val / maxChroma : 0);
-      setChromagram(normalizedChroma);
-
       // Detect the active chord
       const chordResult = findChord(smoothedChromaChord);
       if (chordResult) {
         setDetectedChord(chordResult.chordName);
       } else {
         setDetectedChord(null);
-      }
-
-      // 3. Find the musical key using Krumhansl-Schmuckler correlation
-      const keyResults = findKey(smoothedChroma);
-      if (keyResults.length > 0) {
-        const topMatch = keyResults[0];
-        // Only set key if correlation (confidence) is reasonably positive
-        if (topMatch.correlation > 0.3) {
-          setDetectedKey(topMatch.keyName);
-          // Scale correlation (usually 0.4 to 0.8) to a percentage (0 to 100)
-          const confPercent = Math.min(100, Math.max(0, Math.round((topMatch.correlation - 0.2) * 166)));
-          setConfidence(confPercent);
-          setAlternativeKeys(keyResults.slice(1, 5)); // Next 4 keys
-        } else {
-          // If correlation is too low, don't change detected key, but lower confidence
-          setConfidence(prev => Math.max(0, prev - 1));
-        }
       }
 
       // 4. Track BPM using low frequency onset detection
@@ -256,6 +277,13 @@ export function useAudioEngine() {
   };
 
   const stopMonitoring = useCallback(() => {
+    // Clear analysis timer if it was running
+    if (analysisTimerRef.current) {
+      clearInterval(analysisTimerRef.current);
+      analysisTimerRef.current = null;
+    }
+    setIsAnalyzingSong(false);
+
     // Stop animation loop
     if (animationFrameRef.current !== null) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -303,9 +331,70 @@ export function useAudioEngine() {
     return audioContextRef.current;
   }, []);
 
+  // Start Song Key & BPM Analysis for a specific duration (locks values at the end)
+  const startSongAnalysis = async (durationSeconds = 8) => {
+    if (analysisTimerRef.current) {
+      clearInterval(analysisTimerRef.current);
+      analysisTimerRef.current = null;
+    }
+
+    // Reset analysis states and buffers
+    setDetectedKey(null);
+    setConfidence(0);
+    setBpm(null);
+    setDetectedChord(null);
+    setAlternativeKeys([]);
+    smoothedChromaRef.current = new Array(12).fill(0);
+    smoothedChromaChordRef.current = new Array(12).fill(0);
+    accumulatedChromaRef.current = new Array(12).fill(0);
+    bpmTrackerRef.current.reset();
+
+    setIsAnalyzingSong(true);
+    setAnalysisCountdown(durationSeconds);
+
+    // Ensure audio monitoring is started
+    await startMonitoring();
+
+    let timeLeft = durationSeconds;
+    analysisTimerRef.current = window.setInterval(() => {
+      timeLeft -= 1;
+      setAnalysisCountdown(timeLeft);
+
+      if (timeLeft <= 0) {
+        // Stop analysis timer
+        if (analysisTimerRef.current) {
+          clearInterval(analysisTimerRef.current);
+          analysisTimerRef.current = null;
+        }
+
+        // Compute final key from accumulated frequencies
+        const finalKeyResults = findKey(accumulatedChromaRef.current);
+        if (finalKeyResults.length > 0) {
+          const topMatch = finalKeyResults[0];
+          setDetectedKey(topMatch.keyName);
+          const confPercent = Math.min(100, Math.max(0, Math.round((topMatch.correlation - 0.2) * 166)));
+          setConfidence(confPercent);
+          setAlternativeKeys(finalKeyResults.slice(1, 5));
+        }
+
+        // Lock BPM
+        const finalBpm = bpmTrackerRef.current.calculateBpm();
+        if (finalBpm) {
+          setBpm(finalBpm);
+        }
+
+        setIsAnalyzingSong(false);
+        stopMonitoring(); // Auto stop microphone stream to lock values!
+      }
+    }, 1000);
+  };
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      if (analysisTimerRef.current) {
+        clearInterval(analysisTimerRef.current);
+      }
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
       }
@@ -335,5 +424,8 @@ export function useAudioEngine() {
     inputLevel,
     errorMsg,
     getAudioContext,
+    isAnalyzingSong,
+    analysisCountdown,
+    startSongAnalysis,
   };
 }
