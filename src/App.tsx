@@ -158,6 +158,7 @@ function App() {
     startMonitoring,
     stopMonitoring,
     detectedKey,
+    detectedChord,
     confidence,
     alternativeKeys,
     chromagram,
@@ -369,6 +370,7 @@ function App() {
           return (
             <KeyDisplay 
               detectedKey={detectedKey}
+              detectedChord={detectedChord}
               confidence={confidence}
               alternativeKeys={alternativeKeys}
               isMonitoring={isMonitoring}

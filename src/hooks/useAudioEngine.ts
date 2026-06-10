@@ -2,10 +2,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { findKey } from '../utils/KeyFinder';
 import type { KeyPrediction } from '../utils/KeyFinder';
 import { BpmTracker } from '../utils/BpmTracker';
+import { findChord } from '../utils/ChordFinder';
 
 export function useAudioEngine() {
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [detectedKey, setDetectedKey] = useState<string | null>(null);
+  const [detectedChord, setDetectedChord] = useState<string | null>(null);
   const [confidence, setConfidence] = useState<number>(0);
   const [alternativeKeys, setAlternativeKeys] = useState<KeyPrediction[]>([]);
   const [chromagram, setChromagram] = useState<number[]>(new Array(12).fill(0));
@@ -28,6 +30,8 @@ export function useAudioEngine() {
   // Chromagram smoothing (exponential moving average)
   const smoothedChromaRef = useRef<number[]>(new Array(12).fill(0));
   const smoothingFactor = 0.97; // High value for slow, stable key detection (takes 2-3 seconds to adjust)
+  const smoothedChromaChordRef = useRef<number[]>(new Array(12).fill(0));
+  const chordSmoothingFactor = 0.88; // Lower value for snappy chord detection (~300ms response)
 
   // Precalculated mapping from FFT bin to pitch class
   const binToPitchClassRef = useRef<number[]>([]);
@@ -113,10 +117,24 @@ export function useAudioEngine() {
         smoothedChroma[i] = (smoothedChroma[i] * smoothingFactor) + (rawChroma[i] * (1 - smoothingFactor));
       }
 
+      // Apply fast exponential moving average (smoothing) to chord chromagram
+      const smoothedChromaChord = smoothedChromaChordRef.current;
+      for (let i = 0; i < 12; i++) {
+        smoothedChromaChord[i] = (smoothedChromaChord[i] * chordSmoothingFactor) + (rawChroma[i] * (1 - chordSmoothingFactor));
+      }
+
       // Normalize smoothed chromagram for UI rendering (0 to 1 scale)
       const maxChroma = Math.max(...smoothedChroma);
       const normalizedChroma = smoothedChroma.map(val => maxChroma > 0 ? val / maxChroma : 0);
       setChromagram(normalizedChroma);
+
+      // Detect the active chord
+      const chordResult = findChord(smoothedChromaChord);
+      if (chordResult) {
+        setDetectedChord(chordResult.chordName);
+      } else {
+        setDetectedChord(null);
+      }
 
       // 3. Find the musical key using Krumhansl-Schmuckler correlation
       const keyResults = findKey(smoothedChroma);
@@ -156,6 +174,13 @@ export function useAudioEngine() {
       for (let i = 0; i < 12; i++) {
         smoothedChroma[i] *= 0.95;
       }
+      
+      const smoothedChromaChord = smoothedChromaChordRef.current;
+      for (let i = 0; i < 12; i++) {
+        smoothedChromaChord[i] *= 0.85;
+      }
+      setDetectedChord(null);
+
       const maxChroma = Math.max(...smoothedChroma);
       const normalizedChroma = smoothedChroma.map(val => maxChroma > 0 ? val / maxChroma : 0);
       setChromagram(normalizedChroma);
@@ -207,8 +232,10 @@ export function useAudioEngine() {
 
       // Clear previous states
       smoothedChromaRef.current = new Array(12).fill(0);
+      smoothedChromaChordRef.current = new Array(12).fill(0);
       setChromagram(new Array(12).fill(0));
       setDetectedKey(null);
+      setDetectedChord(null);
       setConfidence(0);
       setBpm(null);
       bpmTrackerRef.current.reset();
@@ -296,6 +323,7 @@ export function useAudioEngine() {
     startMonitoring,
     stopMonitoring,
     detectedKey,
+    detectedChord,
     confidence,
     alternativeKeys,
     chromagram,
