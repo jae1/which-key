@@ -169,7 +169,7 @@ function App() {
     inputLevel,
     getAudioContext,
     isAnalyzingSong,
-    analysisCountdown,
+    analysisSecondsElapsed,
     startSongAnalysis,
   } = useAudioEngine();
 
@@ -380,7 +380,7 @@ function App() {
               onStopMonitoring={stopMonitoring}
               hideHeader={true}
               isAnalyzingSong={isAnalyzingSong}
-              analysisCountdown={analysisCountdown}
+              analysisSecondsElapsed={analysisSecondsElapsed}
               onStartSongAnalysis={startSongAnalysis}
             />
           );

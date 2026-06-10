@@ -20,6 +20,7 @@ export function useAudioEngine() {
   // Song Analyzer states
   const [isAnalyzingSong, setIsAnalyzingSong] = useState(false);
   const [analysisCountdown, setAnalysisCountdown] = useState(0);
+  const [analysisSecondsElapsed, setAnalysisSecondsElapsed] = useState(0);
 
   // Audio nodes and context refs
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -107,12 +108,23 @@ export function useAudioEngine() {
       const rawChroma = new Array(12).fill(0);
       const binToPitchClass = binToPitchClassRef.current;
 
+      // Find the peak dB in the current frequency frame
+      let maxDb = -Infinity;
+      for (let i = 0; i < frequencyData.length; i++) {
+        if (binToPitchClass[i] !== -1 && frequencyData[i] > maxDb) {
+          maxDb = frequencyData[i];
+        }
+      }
+
+      // Dynamic threshold: only count bins within 25dB of peak, with an absolute floor of -95dB
+      const cutoffDb = Math.max(-95, maxDb - 25);
+
       for (let i = 0; i < frequencyData.length; i++) {
         const pitchClass = binToPitchClass[i];
         if (pitchClass !== -1) {
-          // Convert dB to linear amplitude
           const db = frequencyData[i];
-          if (db > -70) { // Only count signals above -70dB noise floor (ignores power line hum & room hum)
+          if (db > cutoffDb) {
+            // Convert dB to linear amplitude
             const linearMag = Math.pow(10, db / 20);
             rawChroma[pitchClass] += linearMag;
           }
@@ -331,8 +343,8 @@ export function useAudioEngine() {
     return audioContextRef.current;
   }, []);
 
-  // Start Song Key & BPM Analysis for a specific duration (locks values at the end)
-  const startSongAnalysis = async (durationSeconds = 8) => {
+  // Start Song Key & BPM Analysis for an adaptive duration (locks values on confidence/stability)
+  const startSongAnalysis = async (maxDurationSeconds = 15) => {
     if (analysisTimerRef.current) {
       clearInterval(analysisTimerRef.current);
       analysisTimerRef.current = null;
@@ -350,17 +362,55 @@ export function useAudioEngine() {
     bpmTrackerRef.current.reset();
 
     setIsAnalyzingSong(true);
-    setAnalysisCountdown(durationSeconds);
+    setAnalysisCountdown(maxDurationSeconds);
+    setAnalysisSecondsElapsed(0);
 
     // Ensure audio monitoring is started
     await startMonitoring();
 
-    let timeLeft = durationSeconds;
-    analysisTimerRef.current = window.setInterval(() => {
-      timeLeft -= 1;
-      setAnalysisCountdown(timeLeft);
+    let elapsed = 0;
+    let lastKeyName: string | null = null;
+    let stabilityCount = 0;
 
-      if (timeLeft <= 0) {
+    analysisTimerRef.current = window.setInterval(() => {
+      elapsed += 1;
+      setAnalysisSecondsElapsed(elapsed);
+      setAnalysisCountdown(maxDurationSeconds - elapsed);
+
+      // Check the accumulated chromagram so far
+      const currentChroma = accumulatedChromaRef.current;
+      const keyResults = findKey(currentChroma);
+      
+      let shouldLock = false;
+      let topMatch = keyResults.length > 0 ? keyResults[0] : null;
+
+      if (topMatch && topMatch.correlation > 0.35) {
+        // Check stability
+        if (topMatch.keyName === lastKeyName) {
+          stabilityCount += 1;
+        } else {
+          stabilityCount = 1;
+          lastKeyName = topMatch.keyName;
+        }
+
+        // Adaptive Lock Conditions:
+        // 1. High Confidence: correlation >= 0.75 after at least 3 seconds
+        // 2. High Stability: same key predicted for 4 consecutive seconds and correlation >= 0.50
+        if (elapsed >= 3) {
+          if (topMatch.correlation >= 0.75) {
+            shouldLock = true;
+          } else if (stabilityCount >= 4 && topMatch.correlation >= 0.50) {
+            shouldLock = true;
+          }
+        }
+      } else {
+        // If there's no match or extremely low correlation, reset stability
+        stabilityCount = 0;
+        lastKeyName = null;
+      }
+
+      // If confident, or if we hit the maximum analysis time
+      if (shouldLock || elapsed >= maxDurationSeconds) {
         // Stop analysis timer
         if (analysisTimerRef.current) {
           clearInterval(analysisTimerRef.current);
@@ -369,12 +419,17 @@ export function useAudioEngine() {
 
         // Compute final key from accumulated frequencies
         const finalKeyResults = findKey(accumulatedChromaRef.current);
-        if (finalKeyResults.length > 0) {
-          const topMatch = finalKeyResults[0];
-          setDetectedKey(topMatch.keyName);
-          const confPercent = Math.min(100, Math.max(0, Math.round((topMatch.correlation - 0.2) * 166)));
+        if (finalKeyResults.length > 0 && finalKeyResults[0].correlation >= 0.35) {
+          const finalTopMatch = finalKeyResults[0];
+          setDetectedKey(finalTopMatch.keyName);
+          const confPercent = Math.min(100, Math.max(0, Math.round((finalTopMatch.correlation - 0.2) * 166)));
           setConfidence(confPercent);
           setAlternativeKeys(finalKeyResults.slice(1, 5));
+        } else {
+          // If correlation is too low, we did not detect any key (e.g., silence)
+          setDetectedKey("No Key Detected");
+          setConfidence(0);
+          setAlternativeKeys([]);
         }
 
         // Lock BPM
@@ -426,6 +481,7 @@ export function useAudioEngine() {
     getAudioContext,
     isAnalyzingSong,
     analysisCountdown,
+    analysisSecondsElapsed,
     startSongAnalysis,
   };
 }
