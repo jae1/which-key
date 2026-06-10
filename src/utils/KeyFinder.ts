@@ -1,8 +1,8 @@
 // Krumhansl-Schmuckler Key Finding Algorithm for Chromagram correlation.
 
-// Standard Krumhansl-Kessler key profiles
-const K_K_MAJOR = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88];
-const K_K_MINOR = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17];
+// Sha'ath empirical key profiles (optimized for pop music key finding)
+const K_K_MAJOR = [6.58, 1.34, 3.40, 1.15, 5.48, 3.73, 1.37, 5.92, 1.45, 3.82, 1.10, 3.01];
+const K_K_MINOR = [6.45, 1.63, 2.76, 5.25, 1.57, 3.80, 1.45, 5.27, 3.82, 1.64, 3.42, 2.94];
 
 // Note names
 export const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];

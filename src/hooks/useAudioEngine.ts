@@ -51,10 +51,10 @@ export function useAudioEngine() {
     const binCount = fftSize / 2;
     const binSize = sampleRate / fftSize;
 
-    // We only analyze MIDI notes 30 (F#1, ~46Hz) to 88 (E5, ~659Hz)
-    // This captures instrument fundamentals and filters out high-frequency overtones and room noise
-    const minMidi = 30;
-    const maxMidi = 88;
+    // We analyze MIDI notes 48 (C3, ~130Hz) to 84 (C6, ~1046Hz)
+    // This captures clean instrument fundamentals and filters out low-frequency room rumble and high-frequency overtones
+    const minMidi = 48;
+    const maxMidi = 84;
 
     for (let i = 0; i < binCount; i++) {
       const freq = i * binSize;
@@ -112,7 +112,7 @@ export function useAudioEngine() {
         if (pitchClass !== -1) {
           // Convert dB to linear amplitude
           const db = frequencyData[i];
-          if (db > -90) { // Only count signals above noise floor
+          if (db > -70) { // Only count signals above -70dB noise floor (ignores power line hum & room hum)
             const linearMag = Math.pow(10, db / 20);
             rawChroma[pitchClass] += linearMag;
           }
