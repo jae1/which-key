@@ -29,7 +29,7 @@ export function useAudioEngine() {
   
   // Chromagram smoothing (exponential moving average)
   const smoothedChromaRef = useRef<number[]>(new Array(12).fill(0));
-  const smoothingFactor = 0.97; // High value for slow, stable key detection (takes 2-3 seconds to adjust)
+  const smoothingFactor = 0.985; // High value for extremely slow, stable key detection (takes 5-6 seconds to adjust)
   const smoothedChromaChordRef = useRef<number[]>(new Array(12).fill(0));
   const chordSmoothingFactor = 0.88; // Lower value for snappy chord detection (~300ms response)
 

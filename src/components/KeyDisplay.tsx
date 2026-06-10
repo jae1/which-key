@@ -162,63 +162,29 @@ export function KeyDisplay({
   // 3. Active key detected (shows real-time results or last-held results)
   return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '248px', width: '100%', padding: '2px 0', gap: '6px' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          {/* Key Section */}
-          <div style={{ flex: 1, textAlign: 'center', background: 'var(--bg-secondary, rgba(128,128,128,0.02))', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '6px 4px' }}>
-            <span style={{ 
-              fontSize: '8px', 
-              fontWeight: 700, 
-              color: 'var(--text-muted)', 
-              textTransform: 'uppercase', 
-              letterSpacing: '0.5px',
-              display: 'block',
-              marginBottom: '2px'
-            }}>
-              {isMonitoring ? 'Overall Key' : 'Last Key (Hold)'}
-            </span>
-            <div style={{ 
-              fontSize: '18px', 
-              fontWeight: 800, 
-              color: 'var(--text-primary)', 
-              fontFamily: 'Outfit, var(--font-sans)', 
-              lineHeight: 1.1 
-            }}>{keyName}</div>
-          </div>
-
-          {/* Chord Section */}
-          <div style={{ flex: 1, textAlign: 'center', background: 'var(--primary-glow)', border: '1px solid var(--primary)', borderRadius: '8px', padding: '6px 4px' }}>
-            <span style={{ 
-              fontSize: '8px', 
-              fontWeight: 700, 
-              color: isMonitoring ? 'var(--primary)' : 'var(--text-muted)', 
-              textTransform: 'uppercase', 
-              letterSpacing: '0.5px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '3px',
-              marginBottom: '2px'
-            }}>
-              {isMonitoring && <span className="pulse-dot" style={{ width: '4px', height: '4px', backgroundColor: 'var(--primary)' }} />}
-              {isMonitoring ? 'Live Chord' : 'Last Chord'}
-            </span>
-            <div style={{ 
-              fontSize: '18px', 
-              fontWeight: 800, 
-              color: 'var(--primary)', 
-              fontFamily: 'Outfit, var(--font-sans)', 
-              lineHeight: 1.1 
-            }}>
-              {detectedChord ? detectedChord : (isMonitoring ? '...' : 'None')}
-            </div>
-          </div>
-        </div>
-
+      <div style={{ textAlign: 'center', padding: '1px 0' }}>
+        <span style={{ 
+          fontSize: '9px', 
+          fontWeight: 700, 
+          color: isMonitoring ? 'var(--primary)' : 'var(--text-muted)', 
+          textTransform: 'uppercase', 
+          letterSpacing: '1px' 
+        }}>
+          {isMonitoring ? 'LIVE DETECTED KEY' : 'LAST DETECTED KEY (HOLD)'}
+        </span>
+        <div style={{ 
+          fontSize: '28px', 
+          fontWeight: 800, 
+          color: 'var(--text-primary)', 
+          fontFamily: 'Outfit, var(--font-sans)', 
+          margin: '2px 0', 
+          lineHeight: 1.1 
+        }}>{keyName}</div>
+        
         {/* Confidence Progress Bar */}
-        <div style={{ width: '100%', padding: '0 2px' }}>
+        <div style={{ maxWidth: '180px', margin: '0 auto 6px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', marginBottom: '2px', fontWeight: 500 }}>
-            <span style={{ color: 'var(--text-secondary)' }}>Key Confidence</span>
+            <span style={{ color: 'var(--text-secondary)' }}>Confidence</span>
             <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{confidence}%</span>
           </div>
           <div style={{ width: '100%', height: '3px', backgroundColor: 'var(--border-color)', borderRadius: '1.5px', overflow: 'hidden' }}>
@@ -232,6 +198,24 @@ export function KeyDisplay({
               }} 
             />
           </div>
+        </div>
+
+        {/* Small Live Chord Indicator */}
+        <div style={{ 
+          display: 'inline-flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          gap: '4px',
+          fontSize: '11px', 
+          fontWeight: 600, 
+          color: isMonitoring ? 'var(--text-secondary)' : 'var(--text-muted)',
+          background: 'var(--border-color)',
+          padding: '2px 8px',
+          borderRadius: '12px',
+          marginTop: '2px'
+        }}>
+          {isMonitoring && <span className="pulse-dot" style={{ width: '4px', height: '4px', backgroundColor: 'var(--primary)' }} />}
+          <span>Live Chord: <strong style={{ color: 'var(--primary)', fontWeight: 700 }}>{detectedChord || (isMonitoring ? '...' : 'None')}</strong></span>
         </div>
       </div>
 
